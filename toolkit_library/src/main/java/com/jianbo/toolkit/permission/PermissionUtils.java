@@ -2,6 +2,7 @@ package com.jianbo.toolkit.permission;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -15,8 +16,8 @@ import java.util.List;
  * Created by Jianbo on 2018/3/29.
  */
 
-public class PermissionUtil {
-    public static final String TAG = PermissionUtil.class.getSimpleName();
+public class PermissionUtils {
+    public static final String TAG = PermissionUtils.class.getSimpleName();
     private static final int REQUEST_CODE = 0x200;
     private static final int PERMISSION_UNTREATED = 1;
     private static final int PERMISSION_GRANTED = 2;
@@ -26,6 +27,10 @@ public class PermissionUtil {
 
     public static void checkPermissions(Activity activity, String[] permissions, PermissionsListener listener) {
         permissionsListener = listener;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            callbackRequestResult(PERMISSION_GRANTED, permissions);
+            return;
+        }
         List<String> denied = new ArrayList<>();
         List<String> banned = new ArrayList<>();
         for (String permission : permissions) {
