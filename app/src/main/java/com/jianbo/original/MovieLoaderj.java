@@ -1,7 +1,9 @@
 package com.jianbo.original;
 
 import android.content.Context;
+import android.content.Intent;
 
+import com.jianbo.original.splash.GuideActivity;
 import com.jianbo.toolkit.prompt.LogUtils;
 import com.tamic.novate.Novate;
 import com.tamic.novate.Throwable;
@@ -55,6 +57,8 @@ public class MovieLoaderj {
 
         float f = 123.22f;
         String.valueOf(f);
+
+
     }
 }
 

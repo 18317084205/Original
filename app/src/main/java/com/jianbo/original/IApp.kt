@@ -12,6 +12,7 @@ class IApp : Application() {
     override fun onCreate() {
         super.onCreate()
         HttpUtils.init(this,HttpRequest())
+        registerActivityLifecycleCallbacks(ActivityLifecycle)
     }
 
 }

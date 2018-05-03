@@ -2,6 +2,8 @@ package com.jianbo.toolkit.prompt;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
 
@@ -46,6 +48,23 @@ public class APPUtils {
         Uri uri = Uri.fromParts("package", context.getApplicationContext().getPackageName(), null);
         intent.setData(uri);
         context.startActivity(intent);
+    }
+
+    /**
+     * 获取app meta data
+     * @param ctx   上下文
+     * @param key   key
+     * @return      meta data
+     */
+    public static String getAppMetaData(Context ctx, final String key) {
+        try {
+            ApplicationInfo info = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+                    PackageManager.GET_META_DATA);
+            return info.metaData.getString(key);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }
