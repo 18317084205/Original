@@ -3,6 +3,7 @@ package com.jianbo.toolkit.http.rxhttp;
 import com.jianbo.toolkit.http.RequestManager;
 import com.jianbo.toolkit.http.callback.ICallBack;
 import com.jianbo.toolkit.prompt.LogUtils;
+import com.jianbo.toolkit.rxjava.RxUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +54,7 @@ public abstract class IRxHttp<T> {
                     }
                 })
                 .onErrorResumeNext(new RxFactory.HttpResponseFunc<T>())
-                .compose(RxFactory.<T>transformer())
+                .compose(RxUtils.<T>observableTransformer())
                 .subscribe(new Observer<T>() {
                     @Override
                     public void onSubscribe(Disposable d) {

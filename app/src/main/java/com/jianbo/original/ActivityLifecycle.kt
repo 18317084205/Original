@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import com.jianbo.toolkit.rxjava.RxUtils
 
 /**
  * Created by Jianbo on 2018/5/3.
  */
 object ActivityLifecycle : Application.ActivityLifecycleCallbacks {
-    override fun onActivityPaused(p0: Activity?) {
+    override fun onActivityPaused(activity: Activity?) {
     }
 
     override fun onActivityResumed(activity: Activity?) {
@@ -21,6 +22,7 @@ object ActivityLifecycle : Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityDestroyed(activity: Activity?) {
+        RxUtils.removeDisposable(activity)
     }
 
     override fun onActivitySaveInstanceState(activity: Activity?, p1: Bundle?) {
@@ -36,6 +38,5 @@ object ActivityLifecycle : Application.ActivityLifecycleCallbacks {
                 activity.onBackPressed()
             }
         }
-
     }
 }

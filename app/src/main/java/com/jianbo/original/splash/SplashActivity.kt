@@ -2,9 +2,13 @@ package com.jianbo.original.splash
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import com.jianbo.toolkit.prompt.WindowUtils
+import com.jianbo.toolkit.rxjava.RxUtils
+import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
+
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -12,18 +16,20 @@ import com.jianbo.toolkit.prompt.WindowUtils
  */
 class SplashActivity : AppCompatActivity() {
 
-    private val handler = Handler()
-
-    private val runnable = Runnable {
-        startActivity(Intent(this, GuideActivity::class.java))
-        finish()
-    }
+    private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowUtils.hideBottomUIMenu(this)
         super.onCreate(savedInstanceState)
 
-        handler.postDelayed(runnable, 2000)
+        disposable = Flowable.timer(2000, TimeUnit.MILLISECONDS)
+                .compose(RxUtils.flyableTransformer<Long>())
+                .subscribe {
+                    startActivity(Intent(this, GuideActivity::class.java))
+                    finish()
+                }
+
+        RxUtils.addDisposable(this, disposable)
     }
 
     override fun onDestroy() {

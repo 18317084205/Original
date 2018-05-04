@@ -22,10 +22,11 @@ public class Utils {
 
     /**
      * 获取反射字段
+     *
      * @param className 反射类
      * @param fieldName 字段名
      * @param obj       反射对象
-     * @return          反射字段
+     * @return 反射字段
      */
     public static Object getReflectField(String className, String fieldName, Object obj) {
         try {
@@ -36,5 +37,9 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isNotNull(Object o) {
+        return o != null;
     }
 }
