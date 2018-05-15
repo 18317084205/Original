@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme_Splash" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Theme_Splash">
         <item name="android:windowBackground">@mipmap/img_splash</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:fitsSystemWindows">true</item>

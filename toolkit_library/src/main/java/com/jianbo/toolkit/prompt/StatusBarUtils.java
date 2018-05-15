@@ -5,11 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -39,7 +43,7 @@ public class StatusBarUtils {
      * 设置透明状态栏
      *
      * @param activity   activity
-     * @param themeColor 状态栏背景是否使用主题色
+     * @param themeColor 状态栏背景主题色0为透明色
      */
     public static void setTransparentStatusBar(Activity activity, int themeColor) {
         Window window = activity.getWindow();
@@ -62,15 +66,29 @@ public class StatusBarUtils {
 
     /**
      * @param activity                 activity
-     * @param themeColor               是否要状态栏的颜色，不设置则为透明色
-     * @param withoutUseStatusBarColor 是否不需要使用状态栏为暗色调
+     * @param themeColor               状态栏背景主题色0为透明色
+     * @param withoutUseStatusBarColor 是否需要使用状态栏为暗色调
      */
     public static void setStatusBar(Activity activity, int themeColor, boolean withoutUseStatusBarColor) {
         setTransparentStatusBar(activity, themeColor);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !withoutUseStatusBarColor) {
-            activity.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        LogUtils.e(isMINI() + "");
+        if (isFlame()) {
+            processFlyMe(activity, withoutUseStatusBarColor);
+        } else if (isMINI()) {
+            processMIUI(activity, withoutUseStatusBarColor);
+        } else {
+            if (withoutUseStatusBarColor) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    activity.getWindow().getDecorView().setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    activity.getWindow().getDecorView().setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                }
+            }
+            activity.getWindow().getDecorView().findViewById(android.R.id.content).setPadding(0, 0, 0, 0);
         }
     }
 
@@ -78,7 +96,7 @@ public class StatusBarUtils {
     /**
      * 改变魅族的状态栏字体为黑色，要求FlyMe4以上
      */
-    private static void processFlyMe(Activity activity, boolean darkmode) {
+    private static void processFlyMe(Activity activity, boolean darkened) {
         Window window = activity.getWindow();
         if (window != null) {
             try {
@@ -91,7 +109,7 @@ public class StatusBarUtils {
                 meiZuFlags.setAccessible(true);
                 int bit = darkFlag.getInt((Object) null);
                 int value = meiZuFlags.getInt(lp);
-                if (darkmode) {
+                if (darkened) {
                     value |= bit;
                 } else {
                     value &= ~bit;
@@ -108,11 +126,11 @@ public class StatusBarUtils {
     /**
      * 改变小米的状态栏字体颜色为黑色, 要求MIUI6以上  lightStatusBar为真时表示黑色字体
      */
-    private static void processMIUI(Activity activity, boolean darkmode) {
+    private static void processMIUI(Activity activity, boolean darkened) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 即基于 Android 6.0 ，开发版 7.7.13 及以后版本
-            compatHighMIUI(activity, darkmode);
+            compatHighMIUI(activity, darkened);
         } else {
-            compatLowMIUI(activity, darkmode);
+            compatLowMIUI(activity, darkened);
         }
     }
 
@@ -155,11 +173,17 @@ public class StatusBarUtils {
     /**
      * 判断手机是否是小米
      */
-    public static boolean isMIUI() {
+    public static boolean isMINI() {
         final Properties prop = new Properties();
-        return prop.getProperty(KEY_MIUI_VERSION_CODE, null) != null
-                || prop.getProperty(KEY_MIUI_VERSION_NAME, null) != null
-                || prop.getProperty(KEY_MIUI_INTERNAL_STORAGE, null) != null;
+        try {
+            prop.load(new FileInputStream(new File(Environment.getRootDirectory(), "build.prop")));
+            return prop.getProperty(KEY_MIUI_VERSION_CODE, null) != null
+                    || prop.getProperty(KEY_MIUI_VERSION_NAME, null) != null
+                    || prop.getProperty(KEY_MIUI_INTERNAL_STORAGE, null) != null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -167,7 +191,7 @@ public class StatusBarUtils {
      *
      * @return
      */
-    public static boolean isFlyme() {
+    public static boolean isFlame() {
         try {
             // Invoke Build.hasSmartBar()
             final Method method = Build.class.getMethod("hasSmartBar");
@@ -183,24 +207,7 @@ public class StatusBarUtils {
      * @param useDart  是否使用深色调
      * @param activity activity
      */
-    public static void setStatusTextColor(boolean useDart, Activity activity) {
-        if (isFlyme()) {
-            processFlyMe(activity, useDart);
-        } else if (isMIUI()) {
-            processMIUI(activity, useDart);
-        } else {
-            if (useDart) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    activity.getWindow().getDecorView().setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                }
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    activity.getWindow().getDecorView().setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-                }
-            }
-            activity.getWindow().getDecorView().findViewById(android.R.id.content).setPadding(0, 0, 0, 0);
-        }
+    public static void setStatusTextColor(Activity activity, boolean useDart) {
+
     }
 }

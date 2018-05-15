@@ -56,7 +56,7 @@ class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListen
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarUtils.setStatusBar(this, 0, false);
+        StatusBarUtils.setStatusBar(this, 0, true);
         setContentView(R.layout.activity_guide)
         super.onCreate(savedInstanceState)
         viewpager = findViewById(R.id.viewPager)

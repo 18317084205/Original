@@ -3,6 +3,7 @@ package com.jianbo.original
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
@@ -32,11 +33,11 @@ object ActivityLifecycle : Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityCreated(activity: Activity?, p1: Bundle?) {
-        if (activity!!.findViewById<ViewGroup>(R.id.toolbar) != null) {
-            activity?.findViewById<TextView>(R.id.toolbar_title).text = activity.title
-            activity!!.findViewById<Button>(R.id.toolbar_back).setOnClickListener {
-                activity.onBackPressed()
-            }
-        }
+//        if (activity!!.findViewById<View>(R.id.toolbar) != null) {
+//            activity?.findViewById<TextView>(R.id.toolbar_title).text = activity.title
+//            activity!!.findViewById<Button>(R.id.toolbar_back).setOnClickListener {
+//                activity.onBackPressed()
+//            }
+//        }
     }
 }
