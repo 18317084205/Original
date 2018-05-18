@@ -1,5 +1,6 @@
 package com.jianbo.original.http;
 
+import com.jianbo.toolkit.http.okhttp.OkHttpRequest;
 import com.jianbo.toolkit.http.rxhttp.RxHttpRequest;
 
 /**

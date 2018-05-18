@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
+import com.jianbo.toolkit.http.HttpResult;
 import com.jianbo.toolkit.http.HttpUtils;
-import com.jianbo.toolkit.http.callback.ICallBack;
+import com.jianbo.toolkit.http.ICallManager;
+import com.jianbo.toolkit.http.base.ICallBack;
 import com.jianbo.toolkit.prompt.LogUtils;
 
 import java.io.File;
@@ -32,20 +34,17 @@ public class RxFactory {
         return BitmapFactory.decodeStream(response.byteStream());
     }
 
-    public static File transformFile(ResponseBody response, String fileDir, String fileName, final ICallBack<File> callBack) throws Exception {
+    public static File transformFile(ResponseBody response, String fileDir, String fileName, final ICallBack<String> callBack) throws Exception {
         String type = "." + response.contentType().subtype();
         if (TextUtils.isEmpty(fileName)) {
             fileName = System.currentTimeMillis() + type;
         }
-
         LogUtils.d("fileName", fileName);
-
         if (TextUtils.isEmpty(fileDir)) {
             fileDir = HttpUtils.getContext().getExternalFilesDir(null) + File.separator;
         }
 
         LogUtils.d("fileDir", fileDir);
-
         byte[] buf = new byte[4096];
         int len = 0;
         FileOutputStream fos = null;
@@ -65,41 +64,18 @@ public class RxFactory {
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                Observable.just(finalSum).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<Long>() {
-                            @Override
-                            public void accept(@NonNull Long aLong) throws Exception {
-                                if (callBack != null) {
-                                    callBack.onProgress(finalSum * 1.0f / total, finalSum, total);
-                                }
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(@NonNull Throwable throwable) throws Exception {
-
-                            }
-                        });
+                ICallManager.sendProgress(finalSum * 1.0f / total, finalSum, total, callBack);
             }
             fos.flush();
+            HttpResult<String> result = new HttpResult<>();
+            result.setCode(0);
+            result.setData(file.getAbsolutePath());
+            ICallManager.sendSuccess(result, callBack);
             return file;
-
-        } catch (IOException e){
-            Observable.just(e).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<IOException>() {
-                        @Override
-                        public void accept(@NonNull IOException e1) throws Exception {
-                            if (callBack != null) {
-                                callBack.onFailure(e1);
-                            }
-                        }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(@NonNull Throwable throwable) throws Exception {
-
-                        }
-                    });
+        } catch (IOException e) {
+            ICallManager.sendFail(e, callBack);
             return null;
-        }finally {
+        } finally {
             if (is != null) try {
                 is.close();
                 if (fos != null) {
@@ -113,7 +89,7 @@ public class RxFactory {
 
     public static class HttpResponseFunc<T> implements Function<Throwable, Observable<T>> {
         @Override
-        public Observable<T> apply(Throwable throwable) throws Exception {
+        public Observable<T> apply(Throwable throwable) {
             return Observable.error(RxException.handleException(throwable));
         }
     }

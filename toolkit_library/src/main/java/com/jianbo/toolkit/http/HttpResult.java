@@ -5,7 +5,7 @@ package com.jianbo.toolkit.http;
  */
 
 public class HttpResult<T> {
-    private static int SUCCESS_CODE = 0;
+    private static final int SUCCESS_CODE = 0;
     private int code;
     private String msg;
     private T data;

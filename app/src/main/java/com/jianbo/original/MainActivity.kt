@@ -10,7 +10,7 @@ import com.jianbo.toolkit.http.callback.FileCallback
 import com.jianbo.toolkit.http.callback.HttpCallback
 import com.jianbo.toolkit.permission.PermissionUtils
 import com.jianbo.toolkit.permission.PermissionsListener
-import com.jianbo.toolkit.prompt.APPUtils
+import com.jianbo.toolkit.prompt.ApplicationUtils
 import com.jianbo.toolkit.prompt.DialogUtils
 import com.jianbo.toolkit.prompt.LogUtils
 import com.jianbo.toolkit.widget.DialogBuilder
@@ -24,6 +24,9 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     private var isOpenedSettings: Boolean = false
     private lateinit var novate: Novate
     private val parameters = HashMap<String, Any>()
+
+    private val url1 = "https://img01.sogoucdn.com/app/a/100520076/61501ee65a9af10c8980e634404dcb54"
+    private val url = "https://dl-sh-ctc-2.pchome.net/04/p8/kwmusic_20180408.zip?key=320f1754144dcf2a2bda15911560de0d&tmp=1523437795810"
 
     private var permissions = arrayOf<String>(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE)
 
@@ -46,22 +49,25 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             val parameters = HashMap<String, String>()
             parameters.put("wd", "java")
 
-            HttpUtils.getInstance().get("btn1", "s", parameters, object : HttpCallback<String>() {
+//            HttpUtils.getInstance().get("btn1", "s", parameters, object : HttpCallback<String>() {
+//                override fun onSuccess(code: Int, result: String?, msg: String?) {
+//
+//                }
+//
+//                override fun onFailure(e: kotlin.Throwable?) {
+//                }
+//
+//
+//            })
+
+
+            HttpUtils.getInstance().download(url, object : FileCallback() {
+                override fun onSuccess(code: Int, result: String?, msg: String?) {
+                    if (result == null) return
+                    LogUtils.e("55555.abc", result)
+                }
+
                 override fun onFailure(e: kotlin.Throwable?) {
-                }
-
-                override fun onSuccess(result: String?) {
-                    LogUtils.d("onSuccess", result)
-                }
-            })
-
-            val url = "https://dl-sh-ctc-2.pchome.net/04/p8/kwmusic_20180408.zip?key=320f1754144dcf2a2bda15911560de0d&tmp=1523437795810"
-            HttpUtils.getInstance().get("btn1", url, object : FileCallback() {
-                override fun onFailure(e: kotlin.Throwable?) {
-                }
-
-                override fun onSuccess(result: File?) {
-                    LogUtils.d("55555.abc", result?.absolutePath)
                 }
 
                 override fun onProgress(progress: Float, downloaded: Long, total: Long) {
@@ -72,7 +78,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             })
 
 
-//            HttpUtils.getInstance().tag("btn1").download(url, Environment.getExternalStorageDirectory().toString(), "55555.abc")
+//            HttpUtils.getInstance().tag("btn1").get(url, Environment.getExternalStorageDirectory().toString(), "55555.abc")
 //                    .execute(object : HttpCallback<File>() {
 //                        override fun onFailure(e: kotlin.Throwable?) {
 //                        }
@@ -89,21 +95,21 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
 
         button2.setOnClickListener {
-            val url = "http://imgsrc.baidu.com/imgad/pic/item/96dda144ad345982765b708c06f431adcaef84df.jpg"
-            HttpUtils.getInstance().get("btn1", url, object : BitmapCallback() {
-                override fun onSuccess(result: Bitmap?) {
+
+            HttpUtils.getInstance().bitmap( url1, object : BitmapCallback() {
+                override fun onSuccess(code: Int, result: Bitmap?, msg: String?) {
                     imageView.setImageBitmap(result)
                 }
 
                 override fun onFailure(e: kotlin.Throwable?) {
+
                 }
-
-
             })
         }
 
         button3.setOnClickListener {
-            HttpUtils.getInstance().cancel("btn1")
+            HttpUtils.getInstance().cancel(url)
+            HttpUtils.getInstance().cancel(url1)
         }
     }
 
@@ -125,7 +131,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                     "设置", "退出", object : DialogBuilder.DialogListener {
                 override fun sure() {
                     isOpenedSettings = true
-                    APPUtils.openAppSettings(this@MainActivity)
+                    ApplicationUtils.openAppSettings(this@MainActivity)
                 }
 
                 override fun cancel() {

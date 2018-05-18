@@ -2,7 +2,10 @@ package com.jianbo.toolkit.http;
 
 import android.content.Context;
 
-import com.jianbo.toolkit.http.callback.ICallBack;
+import com.jianbo.toolkit.http.base.ICallBack;
+import com.jianbo.toolkit.http.base.IHttpRequest;
+import com.jianbo.toolkit.http.callback.BitmapCallback;
+import com.jianbo.toolkit.http.callback.FileCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +18,7 @@ public class HttpUtils {
     private IHttpRequest mHttpRequest;
     private static Context sContext;
 
-    public static Context getContext(){
+    public static Context getContext() {
         return sContext;
     }
 
@@ -37,9 +40,19 @@ public class HttpUtils {
         return this;
     }
 
+    public void download(String url, FileCallback callback) {
+        if (isWay(url)) return;
+        mHttpRequest.get(url, callback);
+    }
+
+    public void bitmap(String url, BitmapCallback callback) {
+        if (isWay(url)) return;
+        mHttpRequest.get(url, callback);
+    }
+
     public <T> void get(String tag, String url, ICallBack<T> callback) {
         if (isWay(tag, url, new HashMap<String, String>())) return;
-        mHttpRequest.get(tag, url, callback);
+        get(tag, url, new HashMap<String, String>(), callback);
     }
 
     public <T> void get(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
@@ -58,6 +71,10 @@ public class HttpUtils {
     public <T> void post(String tag, String url, Map<String, String> headers, Map<String, String> params, ICallBack<T> callback) {
         if (isWay(tag, url, params)) return;
         mHttpRequest.post(tag, url, headers, params, callback);
+    }
+
+    private boolean isWay(String url) {
+        return !RequestManager.getInstance().addRequest(url);
     }
 
     private boolean isWay(String tag, String url, Map<String, String> params) {

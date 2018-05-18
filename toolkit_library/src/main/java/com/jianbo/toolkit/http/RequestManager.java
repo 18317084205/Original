@@ -1,9 +1,13 @@
 package com.jianbo.toolkit.http;
 
+import com.jianbo.toolkit.prompt.LogUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Jianbo on 2018/4/10.
@@ -11,7 +15,11 @@ import java.util.Map;
 
 public class RequestManager {
 
-    private Map<String, List<String>> requests;
+    private static final int MIN_REQUEST_DELAY_TIME = 5000;
+    private Map<String, Set<String>> requests;
+    private Set<String> getRequests;
+    private long lastRequestTime = 0;
+
 
     private static class CreateRequestManager {
         private static final RequestManager manager = new RequestManager();
@@ -23,6 +31,11 @@ public class RequestManager {
 
     private RequestManager() {
         requests = new HashMap<>();
+        getRequests = new HashSet<>();
+    }
+
+    public boolean addRequest(String url) {
+        return getRequests.add(url);
     }
 
     public boolean addRequest(String tag, String url, Map<String, String> params) {
@@ -31,24 +44,33 @@ public class RequestManager {
     }
 
     public boolean addRequest(String tag, String requestName) {
-        List<String> requestList = requests.get(tag);
+        long curRequestTime = System.currentTimeMillis();
+
+        Set<String> requestList = requests.get(tag);
         if (requestList == null) {
-            requestList = new ArrayList<>();
-            requestList.add(requestName);
+            requestList = new HashSet<>();
             requests.put(tag, requestList);
+        }
+        if (requestList.add(requestName)) {
+            lastRequestTime = curRequestTime;
+            return true;
+        } else if ((curRequestTime - lastRequestTime) >= MIN_REQUEST_DELAY_TIME) {
+            lastRequestTime = curRequestTime;
             return true;
         }
+        return false;
+    }
 
-        if (requestList.contains(requestName)) {
-            return false;
+    public void removeRequest(String url) {
+        LogUtils.d("removeRequest :" + url);
+        if (getRequests.contains(url)) {
+            getRequests.remove(url);
         }
-
-        requestList.add(requestName);
-        return true;
     }
 
     public void removeRequest(String tag, String requestName) {
-        List<String> requestList = requests.get(tag);
+        removeRequest(tag);
+        Set<String> requestList = requests.get(tag);
         if (requestList == null) {
             return;
         }
@@ -64,10 +86,12 @@ public class RequestManager {
     }
 
     public void removeReq(String tag) {
+        removeRequest(tag);
         requests.remove(tag);
     }
 
     public void removeAll() {
         requests.clear();
+        getRequests.clear();
     }
 }

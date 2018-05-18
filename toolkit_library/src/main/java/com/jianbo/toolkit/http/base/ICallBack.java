@@ -1,4 +1,6 @@
-package com.jianbo.toolkit.http.callback;
+package com.jianbo.toolkit.http.base;
+
+import com.jianbo.toolkit.http.HttpResult;
 
 import okhttp3.ResponseBody;
 
@@ -20,9 +22,9 @@ public abstract class ICallBack<T> extends IObserver<T> {
 
     }
 
-    public abstract T convertSuccess(ResponseBody responseBody) throws Exception;
+    public abstract HttpResult<T> convertSuccess(ResponseBody responseBody) throws Exception;
 
-    public abstract void onSuccess(T result);
+    public abstract void onSuccess(int code, T result, String msg);
 
     public void onFailure(Throwable e) {
     }

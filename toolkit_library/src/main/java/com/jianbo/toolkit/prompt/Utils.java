@@ -9,16 +9,7 @@ import java.lang.reflect.Field;
  */
 
 public class Utils {
-    public static <T> T checkNotNull(T object, String message) {
-        if (object == null) {
-            throw new NullPointerException(message);
-        }
-        return object;
-    }
 
-    public static boolean checkMain() {
-        return Thread.currentThread() == Looper.getMainLooper().getThread();
-    }
 
     /**
      * 获取反射字段
@@ -39,7 +30,4 @@ public class Utils {
         return null;
     }
 
-    public static boolean isNotNull(Object o) {
-        return o != null;
-    }
 }

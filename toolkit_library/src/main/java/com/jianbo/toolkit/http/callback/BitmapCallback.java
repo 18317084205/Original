@@ -2,8 +2,11 @@ package com.jianbo.toolkit.http.callback;
 
 import android.graphics.Bitmap;
 
+import com.jianbo.toolkit.http.HttpResult;
+import com.jianbo.toolkit.http.base.ICallBack;
 import com.jianbo.toolkit.http.rxhttp.RxFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.ResponseBody;
@@ -15,7 +18,10 @@ import okhttp3.ResponseBody;
 public abstract class BitmapCallback extends ICallBack<Bitmap> {
 
     @Override
-    public Bitmap convertSuccess(ResponseBody responseBody) throws IOException {
-        return RxFactory.transformBitmap(responseBody);
+    public HttpResult<Bitmap> convertSuccess(ResponseBody responseBody) throws IOException {
+        HttpResult<Bitmap> result = new HttpResult<>();
+        result.setCode(0);
+        result.setData(RxFactory.transformBitmap(responseBody));
+        return result;
     }
 }

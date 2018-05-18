@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jianbo.toolkit.http.HttpResult;
+import com.jianbo.toolkit.http.base.ICallBack;
 import com.jianbo.toolkit.prompt.LogUtils;
 
 import org.json.JSONObject;
@@ -27,19 +28,23 @@ public abstract class HttpCallback<T> extends ICallBack<T> {
     private String dataStr = "";
 
     @Override
-    public T convertSuccess(ResponseBody responseBody) throws IOException {
+    public HttpResult<T> convertSuccess(ResponseBody responseBody) throws IOException {
         Class<T> entityClass = getTClass();
+        String jString = new String(responseBody.bytes());
         if (entityClass == String.class) {
             LogUtils.e("onResponse", entityClass.toString());
-            return (T) new String(responseBody.bytes());
+            HttpResult<T> result = new HttpResult<>();
+            result.setData((T) jString);
+            return result;
         }
-        String jString = new String(responseBody.bytes());
         return transform(jString, entityClass);
     }
 
-    public T transform(String response, Class classOfT) {
+    public HttpResult<T> transform(String response, Class classOfT) {
+        HttpResult<T> result = new HttpResult<>();
         if (classOfT == HttpResult.class) {
-            return (T) new Gson().fromJson(response, classOfT);
+            result = (HttpResult<T>) new Gson().fromJson(response, classOfT);
+            return result;
         }
 
         JSONObject jsonObject;
@@ -71,9 +76,13 @@ public abstract class HttpCallback<T> extends ICallBack<T> {
                 }.getType();
                 data = (T) new Gson().fromJson(dataStr, collectionType);
             }
+            result.setCode(code);
+            result.setMsg(msg);
+            result.setData(data);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setMsg(e.getMessage());
         }
-        return data;
+        return result;
     }
 }

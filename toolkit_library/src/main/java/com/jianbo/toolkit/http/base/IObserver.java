@@ -1,4 +1,4 @@
-package com.jianbo.toolkit.http.callback;
+package com.jianbo.toolkit.http.base;
 
 import java.lang.reflect.ParameterizedType;
 

@@ -19,7 +19,7 @@ import retrofit2.http.Url;
 public interface RxService {
     @Streaming
     @GET
-    Observable<ResponseBody> getResponse(@Url String url);
+    Observable<ResponseBody> get(@Url String url);
 
     @GET
     Observable<ResponseBody> getResponse(@Url String url, @HeaderMap Map<String, String> headers, @QueryMap Map<String, String> params);

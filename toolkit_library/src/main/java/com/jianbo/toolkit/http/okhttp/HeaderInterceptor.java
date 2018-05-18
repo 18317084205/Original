@@ -12,10 +12,10 @@ import okhttp3.Response;
  * Created by Jianbo on 2018/4/10.
  */
 
-public class OkInterceptor implements Interceptor {
+public class HeaderInterceptor implements Interceptor {
     private Map<String, String> headers;
 
-    public OkInterceptor(Map<String, String> headers) {
+    public HeaderInterceptor(Map<String, String> headers) {
         this.headers = headers;
     }
 
