@@ -1,41 +1,43 @@
 package com.jianbo.toolkit.http;
 
+import com.jianbo.toolkit.http.base.ReqResult;
 import com.jianbo.toolkit.http.base.ICallBack;
-import com.jianbo.toolkit.prompt.ApplicationUtils;
-import com.jianbo.toolkit.rxjava.RxUtils;
+import com.jianbo.toolkit.http.execption.HttpThrowable;
+import com.jianbo.toolkit.prompt.AppUtils;
+import com.jianbo.toolkit.prompt.rxjava.RxUtils;
 
 import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public class ICallManager {
+public class CallManager {
 
-    public static <T> void sendSuccess(HttpResult<T> data, final ICallBack callback) {
+    public static <T> void sendSuccess(ReqResult<T> data, final ICallBack callback) {
 
-        Flowable.just(data).compose(RxUtils.<HttpResult<T>>flyableTransformer()).subscribe(new Consumer<HttpResult<T>>() {
+        Flowable.just(data).compose(RxUtils.<ReqResult<T>>flyableTransformer()).subscribe(new Consumer<ReqResult<T>>() {
             @Override
-            public void accept(HttpResult<T> tHttpResult) throws Exception {
-                if (ApplicationUtils.isNotNull(callback)) {
-                    callback.onSuccess(tHttpResult.getCode(), tHttpResult.getData(), tHttpResult.getMsg());
+            public void accept(ReqResult<T> tReqResult) throws Exception {
+                if (AppUtils.isNotNull(callback)) {
+                    callback.onSuccess(tReqResult.getCode(), tReqResult.getData(), tReqResult.getMsg());
                 }
             }
         });
     }
 
 
-    public static void sendFail(Exception e, final ICallBack callback) {
+    public static void sendFail(Throwable e, final ICallBack callback) {
         Flowable.just(e).compose(RxUtils.<Throwable>flyableTransformer()).subscribe(new Consumer<Throwable>() {
             @Override
             public void accept(Throwable e) throws Exception {
-                if (ApplicationUtils.isNotNull(callback)) {
-                    callback.onFailure(e);
+                if (AppUtils.isNotNull(callback) && e instanceof HttpThrowable) {
+                    HttpThrowable throwable = (HttpThrowable) e;
+                    callback.onFailure(throwable.getCode(), throwable.getMessage());
                 }
             }
         });
     }
 
     public static void sendStart(final ICallBack callback) {
-        if (ApplicationUtils.isNotNull(callback)) {
+        if (AppUtils.isNotNull(callback)) {
             callback.onStart();
         }
     }
@@ -44,7 +46,7 @@ public class ICallManager {
         Flowable.just(callback).compose(RxUtils.<ICallBack>flyableTransformer()).subscribe(new Consumer<ICallBack>() {
             @Override
             public void accept(ICallBack iCallBack) throws Exception {
-                if (ApplicationUtils.isNotNull(iCallBack)) {
+                if (AppUtils.isNotNull(iCallBack)) {
                     iCallBack.onComplete();
                 }
             }
@@ -55,12 +57,11 @@ public class ICallManager {
         Flowable.just(progress).compose(RxUtils.<Float>flyableTransformer()).subscribe(new Consumer<Float>() {
             @Override
             public void accept(Float progress) throws Exception {
-                if (ApplicationUtils.isNotNull(callback)) {
+                if (AppUtils.isNotNull(callback)) {
                     callback.onProgress(progress, downloaded, total);
                 }
             }
         });
     }
-
 
 }

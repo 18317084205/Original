@@ -4,15 +4,17 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.jianbo.toolkit.http.HttpUtils
+import com.jianbo.original.R.id.*
+import com.jianbo.toolkit.http.HttpRequest
 import com.jianbo.toolkit.http.callback.BitmapCallback
 import com.jianbo.toolkit.http.callback.FileCallback
 import com.jianbo.toolkit.http.callback.HttpCallback
 import com.jianbo.toolkit.permission.PermissionUtils
 import com.jianbo.toolkit.permission.PermissionsListener
-import com.jianbo.toolkit.prompt.ApplicationUtils
+import com.jianbo.toolkit.prompt.AppUtils
 import com.jianbo.toolkit.prompt.DialogUtils
 import com.jianbo.toolkit.prompt.LogUtils
+import com.jianbo.toolkit.prompt.ToastUtils
 import com.jianbo.toolkit.widget.DialogBuilder
 import com.tamic.novate.Novate
 import kotlinx.android.synthetic.main.activity_main.*
@@ -61,13 +63,14 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 //            })
 
 
-            HttpUtils.getInstance().download(url, object : FileCallback() {
+            HttpRequest.getInstance().download(url, object : FileCallback() {
                 override fun onSuccess(code: Int, result: String?, msg: String?) {
                     if (result == null) return
                     LogUtils.e("55555.abc", result)
                 }
 
-                override fun onFailure(e: kotlin.Throwable?) {
+                override fun onFailure(code: Int, msg: String?) {
+
                 }
 
                 override fun onProgress(progress: Float, downloaded: Long, total: Long) {
@@ -96,20 +99,20 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
         button2.setOnClickListener {
 
-            HttpUtils.getInstance().bitmap( url1, object : BitmapCallback() {
+            HttpRequest.getInstance().bitmap( url1, object : BitmapCallback() {
                 override fun onSuccess(code: Int, result: Bitmap?, msg: String?) {
                     imageView.setImageBitmap(result)
                 }
 
-                override fun onFailure(e: kotlin.Throwable?) {
-
+                override fun onFailure(code: Int, msg: String?) {
+                    ToastUtils.showToast(this@MainActivity,code.toString() + msg)
                 }
             })
         }
 
         button3.setOnClickListener {
-            HttpUtils.getInstance().cancel(url)
-            HttpUtils.getInstance().cancel(url1)
+            HttpRequest.getInstance().cancel(url)
+            HttpRequest.getInstance().cancel(url1)
         }
     }
 
@@ -131,7 +134,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                     "设置", "退出", object : DialogBuilder.DialogListener {
                 override fun sure() {
                     isOpenedSettings = true
-                    ApplicationUtils.openAppSettings(this@MainActivity)
+                    AppUtils.openAppSettings(this@MainActivity)
                 }
 
                 override fun cancel() {

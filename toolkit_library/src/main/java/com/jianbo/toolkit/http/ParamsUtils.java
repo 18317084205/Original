@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import okhttp3.FormBody;
+
 /**
  * Created by Jianbo on 2018/4/9.
  */
 
-public class RequestUtils {
+public class ParamsUtils {
     /**
      * 拼接url和请求参数
      *
@@ -55,4 +57,14 @@ public class RequestUtils {
         return jsonObject.toString();
     }
 
+    public static FormBody upFormBody(Map<String, String> params) {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        FormBody.Builder builder = new FormBody.Builder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.add(entry.getKey(), entry.getValue());
+        }
+        return builder.build();
+    }
 }

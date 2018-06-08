@@ -18,7 +18,7 @@ public class DensityUtils {
     /**
      * 描述：根据手机分辨率把px像素转换成dip
      */
-    public static int px2dip(Context context ,float px){
+    public static int px2dip(Context context , float px){
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (px / scale + 0.5f);
     }

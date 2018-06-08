@@ -1,9 +1,7 @@
 package com.jianbo.toolkit.prompt;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 

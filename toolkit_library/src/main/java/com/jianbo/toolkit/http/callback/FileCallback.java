@@ -1,11 +1,9 @@
 package com.jianbo.toolkit.http.callback;
 
 
-import com.jianbo.toolkit.http.HttpResult;
+import com.jianbo.toolkit.http.base.ReqResult;
 import com.jianbo.toolkit.http.base.ICallBack;
 import com.jianbo.toolkit.http.rxhttp.RxFactory;
-
-import java.io.File;
 
 import okhttp3.ResponseBody;
 
@@ -24,7 +22,7 @@ public abstract class FileCallback extends ICallBack<String> {
     }
 
     @Override
-    public HttpResult<String> convertSuccess(ResponseBody responseBody) throws Exception {
+    public ReqResult<String> convertSuccess(ResponseBody responseBody) throws Exception {
         RxFactory.transformFile(responseBody, fileDir(), fileName(), this);
         return null;
     }

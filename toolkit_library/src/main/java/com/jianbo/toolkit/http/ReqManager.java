@@ -1,11 +1,7 @@
 package com.jianbo.toolkit.http;
 
-import com.jianbo.toolkit.prompt.LogUtils;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,23 +9,22 @@ import java.util.Set;
  * Created by Jianbo on 2018/4/10.
  */
 
-public class RequestManager {
+public class ReqManager {
 
     private static final int MIN_REQUEST_DELAY_TIME = 5000;
     private Map<String, Set<String>> requests;
     private Set<String> getRequests;
     private long lastRequestTime = 0;
 
-
     private static class CreateRequestManager {
-        private static final RequestManager manager = new RequestManager();
+        private static final ReqManager manager = new ReqManager();
     }
 
-    public static RequestManager getInstance() {
+    public static ReqManager getInstance() {
         return CreateRequestManager.manager;
     }
 
-    private RequestManager() {
+    private ReqManager() {
         requests = new HashMap<>();
         getRequests = new HashSet<>();
     }
@@ -39,7 +34,7 @@ public class RequestManager {
     }
 
     public boolean addRequest(String tag, String url, Map<String, String> params) {
-        String requestName = RequestUtils.urlJoint(tag + url, params);
+        String requestName = ParamsUtils.urlJoint(tag + url, params);
         return addRequest(tag, requestName);
     }
 
@@ -62,7 +57,6 @@ public class RequestManager {
     }
 
     public void removeRequest(String url) {
-        LogUtils.d("removeRequest :" + url);
         if (getRequests.contains(url)) {
             getRequests.remove(url);
         }
@@ -81,7 +75,7 @@ public class RequestManager {
     }
 
     public void removeReq(String tag, String url, Map<String, String> params) {
-        String requestName = RequestUtils.urlJoint(tag + url, params);
+        String requestName = ParamsUtils.urlJoint(tag + url, params);
         removeRequest(tag, requestName);
     }
 

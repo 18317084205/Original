@@ -5,19 +5,13 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Looper;
 import android.provider.Settings;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jianbo on 2018/3/30.
  */
 
-public class ApplicationUtils {
+public class AppUtils {
     /**
      * 打开指定包名的App应用信息界面
      *
@@ -72,6 +66,9 @@ public class ApplicationUtils {
         }
         return "";
     }
+    public static boolean isNotNull(Object o) {
+        return o != null;
+    }
 
     public static <T> T checkNotNull(T object, String message) {
         if (object == null) {
@@ -80,12 +77,7 @@ public class ApplicationUtils {
         return object;
     }
 
-    public static boolean isNotNull(Object o) {
-        return o != null;
+    public static Context appContext() {
+        return null;
     }
-
-    public static boolean checkMain() {
-        return Thread.currentThread() == Looper.getMainLooper().getThread();
-    }
-
 }

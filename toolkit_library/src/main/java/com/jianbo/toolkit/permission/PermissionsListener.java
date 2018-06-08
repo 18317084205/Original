@@ -1,7 +1,5 @@
 package com.jianbo.toolkit.permission;
 
-import android.app.Dialog;
-
 /**
  * Created by Jianbo on 2018/3/29.
  */

@@ -1,9 +1,7 @@
-package com.jianbo.toolkit.rxjava;
+package com.jianbo.toolkit.prompt.rxjava;
 
 import android.app.Activity;
-
-import com.jianbo.toolkit.prompt.ApplicationUtils;
-import com.jianbo.toolkit.prompt.Utils;
+import com.jianbo.toolkit.prompt.AppUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +38,7 @@ public class RxUtils {
     public static void removeDisposable(Activity activity) {
         if (hasDisposables(activity)) {
             for (Disposable disposable : disposableMap.get(activity)) {
-                if (ApplicationUtils.isNotNull(disposable) && !disposable.isDisposed()) {
+                if (AppUtils.isNotNull(disposable) && !disposable.isDisposed()) {
                     disposable.dispose();
                 }
                 disposableMap.remove(disposable);
@@ -58,7 +56,7 @@ public class RxUtils {
             @Override
             public ObservableSource<T> apply(Observable<T> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io());
+                        .observeOn(AndroidSchedulers.mainThread());
             }
         };
     }

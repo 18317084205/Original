@@ -1,7 +1,5 @@
 package com.jianbo.toolkit.http.base;
 
-import com.jianbo.toolkit.http.HttpResult;
-
 import okhttp3.ResponseBody;
 
 /**
@@ -22,11 +20,11 @@ public abstract class ICallBack<T> extends IObserver<T> {
 
     }
 
-    public abstract HttpResult<T> convertSuccess(ResponseBody responseBody) throws Exception;
+    public abstract ReqResult<T> convertSuccess(ResponseBody responseBody) throws Exception;
 
     public abstract void onSuccess(int code, T result, String msg);
 
-    public void onFailure(Throwable e) {
+    public void onFailure(int code, String msg) {
     }
 
     public void onProgress(float progress, long downloaded, long total) {

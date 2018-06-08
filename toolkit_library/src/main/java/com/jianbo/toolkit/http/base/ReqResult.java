@@ -1,10 +1,10 @@
-package com.jianbo.toolkit.http;
+package com.jianbo.toolkit.http.base;
 
 /**
  * Created by Jianbo on 2018/4/10.
  */
 
-public class HttpResult<T> {
+public class ReqResult<T> {
     private static final int SUCCESS_CODE = 0;
     private int code;
     private String msg;

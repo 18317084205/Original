@@ -2,6 +2,8 @@ package com.jianbo.toolkit.prompt;
 
 import android.util.Log;
 
+import com.jianbo.toolkit.BuildConfig;
+
 /**
  * Created by Jianbo on 2018/3/29.
  */
@@ -10,7 +12,7 @@ public class LogUtils {
 
     public static final String TAG = LogUtils.class.getSimpleName();
 
-    public static boolean isDebug = true;
+    public static boolean isDebug = BuildConfig.DEBUG;
 
 
     public static void d(String msg) {

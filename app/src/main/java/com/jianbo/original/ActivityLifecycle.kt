@@ -3,11 +3,7 @@ package com.jianbo.original
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import com.jianbo.toolkit.rxjava.RxUtils
+import com.jianbo.toolkit.prompt.rxjava.RxUtils
 
 /**
  * Created by Jianbo on 2018/5/3.

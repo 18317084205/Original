@@ -1,7 +1,6 @@
 package com.jianbo.toolkit.http.rxhttp;
 
-import com.jianbo.toolkit.prompt.ApplicationUtils;
-import com.jianbo.toolkit.prompt.LogUtils;
+import com.jianbo.toolkit.prompt.AppUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +8,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import io.reactivex.disposables.Disposable;
 
-public class RxRequestManager {
+public class RxReqManager {
     private static Map<String, ConcurrentLinkedQueue<Disposable>> disposables = new HashMap<>();
 
     public static void addDisposable(Disposable d, String tag) {
         ConcurrentLinkedQueue<Disposable> queue = disposables.get(tag);
-        if (!ApplicationUtils.isNotNull(queue)) {
+        if (!AppUtils.isNotNull(queue)) {
             queue = new ConcurrentLinkedQueue<>();
             disposables.put(tag, queue);
         }
@@ -23,9 +22,9 @@ public class RxRequestManager {
 
     public static void rxCancel(String tag) {
         ConcurrentLinkedQueue<Disposable> queue = disposables.get(tag);
-        if (ApplicationUtils.isNotNull(queue)) {
+        if (AppUtils.isNotNull(queue)) {
             for (Disposable disposable : queue) {
-                if (ApplicationUtils.isNotNull(disposable) && !disposable.isDisposed()) {
+                if (AppUtils.isNotNull(disposable) && !disposable.isDisposed()) {
                     disposable.dispose();
                     queue.remove(disposable);
                 }

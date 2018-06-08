@@ -1,7 +1,7 @@
-package com.jianbo.toolkit.prompt;
+package com.jianbo.toolkit.base;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import java.util.Map;
 
@@ -9,31 +9,21 @@ import java.util.Map;
  * Created by Jianbo on 2018/3/30.
  */
 
-public class SPUtils {
+public abstract class BaseSharedPre {
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
 
-    private volatile static SPUtils spUtils;
-
-    public static SPUtils getInstance (Context context) {
-        if (spUtils == null) {
-            synchronized (SPUtils.class) {
-                if (spUtils == null) {
-                    spUtils = new SPUtils(context.getApplicationContext());
-                }
-            }
-        }
-
-        return spUtils;
-    }
 
     /**
      * SPUtils构造函数
      *
-     * @param context 上下文
+     * @param sharedPreferences
      */
-    private SPUtils(Context context) {
-        sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+    public BaseSharedPre(@NonNull SharedPreferences sharedPreferences) {
+        if (sharedPreferences == null) {
+            throw new NullPointerException("sharedPreferences is null !!!");
+        }
+        sp = sharedPreferences;
         editor = sp.edit();
         editor.apply();
     }

@@ -4,9 +4,8 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jianbo.toolkit.http.HttpResult;
 import com.jianbo.toolkit.http.base.ICallBack;
-import com.jianbo.toolkit.prompt.LogUtils;
+import com.jianbo.toolkit.http.base.ReqResult;
 
 import org.json.JSONObject;
 
@@ -28,22 +27,16 @@ public abstract class HttpCallback<T> extends ICallBack<T> {
     private String dataStr = "";
 
     @Override
-    public HttpResult<T> convertSuccess(ResponseBody responseBody) throws IOException {
+    public ReqResult<T> convertSuccess(ResponseBody responseBody) throws IOException {
         Class<T> entityClass = getTClass();
         String jString = new String(responseBody.bytes());
-        if (entityClass == String.class) {
-            LogUtils.e("onResponse", entityClass.toString());
-            HttpResult<T> result = new HttpResult<>();
-            result.setData((T) jString);
-            return result;
-        }
         return transform(jString, entityClass);
     }
 
-    public HttpResult<T> transform(String response, Class classOfT) {
-        HttpResult<T> result = new HttpResult<>();
-        if (classOfT == HttpResult.class) {
-            result = (HttpResult<T>) new Gson().fromJson(response, classOfT);
+    public ReqResult<T> transform(String response, Class classOfT) {
+        ReqResult<T> result = new ReqResult<>();
+        if (classOfT == ReqResult.class) {
+            result = (ReqResult<T>) new Gson().fromJson(response, classOfT);
             return result;
         }
 
@@ -61,20 +54,23 @@ public abstract class HttpCallback<T> extends ICallBack<T> {
             }
 
             dataStr = jsonObject.opt("data").toString();
-            if (TextUtils.isEmpty(dataStr)) {
+            if (TextUtils.isEmpty(dataStr) && jsonObject.has("result")) {
                 dataStr = jsonObject.opt("result").toString();
             }
 
-            if (dataStr.charAt(0) == '{') {
-                data = (T) new Gson().fromJson(dataStr, classOfT);
-            } else if (dataStr.charAt(0) == '[') {
-                dataStr = jsonObject.optJSONArray("data").toString();
-                if (TextUtils.isEmpty(dataStr)) {
-                    dataStr = jsonObject.optJSONArray("result").toString();
+
+            if (!TextUtils.isEmpty(dataStr)) {
+                if (dataStr.charAt(0) == '{') {
+                    data = (T) new Gson().fromJson(dataStr, classOfT);
+                } else if (dataStr.charAt(0) == '[') {
+                    dataStr = jsonObject.optJSONArray("data").toString();
+                    if (TextUtils.isEmpty(dataStr)) {
+                        dataStr = jsonObject.optJSONArray("result").toString();
+                    }
+                    Type collectionType = new TypeToken<List<T>>() {
+                    }.getType();
+                    data = new Gson().fromJson(dataStr, collectionType);
                 }
-                Type collectionType = new TypeToken<List<T>>() {
-                }.getType();
-                data = (T) new Gson().fromJson(dataStr, collectionType);
             }
             result.setCode(code);
             result.setMsg(msg);

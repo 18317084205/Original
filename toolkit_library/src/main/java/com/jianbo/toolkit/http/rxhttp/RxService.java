@@ -4,7 +4,8 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import retrofit2.http.Body;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
@@ -24,7 +25,8 @@ public interface RxService {
     @GET
     Observable<ResponseBody> getResponse(@Url String url, @HeaderMap Map<String, String> headers, @QueryMap Map<String, String> params);
 
+    @FormUrlEncoded
     @POST
-    Observable<ResponseBody> postResponse(@Url String url, @HeaderMap Map<String, String> headers, @Body Map<String, String> parameter);
+    Observable<ResponseBody> postResponse(@Url String url, @HeaderMap Map<String, String> headers, @FieldMap Map<String, String> parameter);
 
 }

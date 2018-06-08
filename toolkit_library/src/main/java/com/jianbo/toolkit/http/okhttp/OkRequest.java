@@ -1,13 +1,15 @@
 package com.jianbo.toolkit.http.okhttp;
 
-import android.support.v4.BuildConfig;
 
-import com.jianbo.toolkit.http.HttpResult;
-import com.jianbo.toolkit.http.ICallManager;
-import com.jianbo.toolkit.http.base.IHttpRequest;
-import com.jianbo.toolkit.http.RequestManager;
-import com.jianbo.toolkit.http.RequestUtils;
+import com.jianbo.toolkit.BuildConfig;
+import com.jianbo.toolkit.http.CallManager;
+import com.jianbo.toolkit.http.ParamsUtils;
+import com.jianbo.toolkit.http.ReqManager;
 import com.jianbo.toolkit.http.base.ICallBack;
+import com.jianbo.toolkit.http.base.ReqResult;
+import com.jianbo.toolkit.http.callback.BitmapCallback;
+import com.jianbo.toolkit.http.callback.FileCallback;
+import com.jianbo.toolkit.http.rxhttp.HttpExpFactory;
 import com.jianbo.toolkit.prompt.LogUtils;
 
 import java.io.IOException;
@@ -20,22 +22,22 @@ import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.HttpException;
 
 /**
  * Created by Jianbo on 2018/4/9.
  */
 
-public class OkHttpRequest extends IHttpRequest {
-
+public abstract class OkRequest extends com.jianbo.toolkit.http.base.Request {
+    private static final String TAG = OkRequest.class.getSimpleName();
     private OkHttpClient okHttpClient;
     private String baseUrl;
 
-    public OkHttpRequest() {
+    public OkRequest() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new HeaderInterceptor(header()));
+        httpClient.addInterceptor(new PInterceptor(commonHeaders()));
         httpClient.connectTimeout(connectTimeout(), TimeUnit.SECONDS);
         httpClient.readTimeout(readTimeOut(), TimeUnit.SECONDS);
         httpClient.writeTimeout(writeTimeout(), TimeUnit.SECONDS);
@@ -46,6 +48,7 @@ public class OkHttpRequest extends IHttpRequest {
         }
         okHttpClient = httpClient.build();
         baseUrl = baseUrl();
+        LogUtils.d(TAG, baseUrl);
     }
 
     @Override
@@ -64,12 +67,7 @@ public class OkHttpRequest extends IHttpRequest {
     }
 
     @Override
-    public String baseUrl() {
-        return "";
-    }
-
-    @Override
-    public Map<String, String> header() {
+    public Map<String, String> commonHeaders() {
         return new HashMap<>();
     }
 
@@ -77,43 +75,58 @@ public class OkHttpRequest extends IHttpRequest {
         get(tag, url, new HashMap<String, String>(), callback);
     }
 
-    protected <T> void get(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
+    public <T> void get(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
         get(tag, url, new HashMap<String, String>(), params, callback);
     }
 
     @Override
     public <T> void get(String tag, String url, Map<String, String> headers, Map<String, String> params,
                         ICallBack<T> callback) {
-        ICallManager.sendStart(callback);
-        String doUrl = RequestUtils.urlJoint(baseUrl + url, params);
+        if (isWay(tag, url, params)) return;
+        CallManager.sendStart(callback);
+        String doUrl = ParamsUtils.urlJoint(baseUrl + url, params);
         Headers heads = Headers.of(headers);
         Request request = new Request.Builder().tag(tag).url(doUrl).headers(heads).build();
         request(tag, doUrl, params, callback, request);
     }
 
     @Override
-    public  <T> void get(String url, ICallBack<T> callback) {
-        ICallManager.sendStart(callback);
+    public <T> void get(String url, ICallBack<T> callback) {
+        if (isWay(url)) return;
+        CallManager.sendStart(callback);
         Request request = new Request.Builder().tag(url).url(url).build();
         request(url, url, new HashMap<String, String>(), callback, request);
     }
 
-    protected <T> void post(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
+    public <T> void post(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
         post(tag, url, new HashMap<String, String>(), params, callback);
     }
 
     @Override
     public <T> void post(String tag, String url, Map<String, String> headers, Map<String, String> params,
                          ICallBack<T> callback) {
-        ICallManager.sendStart(callback);
+        if (isWay(tag, url, params)) return;
+        CallManager.sendStart(callback);
         Headers heads = Headers.of(headers);
-        RequestBody requestBody = RequestBody.create(null, RequestUtils.upMap(params));
-        Request request = new Request.Builder().url(baseUrl + url).headers(heads).post(requestBody).build();
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), ParamsUtils.upMap(params));
+//        LogUtils.e("requestBody", "requestBody:" + requestBody.toString() + ParamsUtils.upMap(params));
+        Request request = new Request.Builder().url(baseUrl + url).headers(heads).post(ParamsUtils.upFormBody(params)).build();
         request(tag, url, params, callback, request);
     }
 
     @Override
+    public void download(String url, FileCallback callback) {
+        get(url, callback);
+    }
+
+    @Override
+    public void bitmap(String url, BitmapCallback callback) {
+        get(url, callback);
+    }
+
+    @Override
     public void cancel(String tag) {
+        super.cancel(tag);
         for (Call call : okHttpClient.dispatcher().queuedCalls()) {
             if (tag.equals(call.request().tag())) {
                 call.cancel();
@@ -128,6 +141,7 @@ public class OkHttpRequest extends IHttpRequest {
 
     @Override
     public void cancelAll() {
+        super.cancelAll();
         for (Call call : okHttpClient.dispatcher().queuedCalls()) {
             call.cancel();
         }
@@ -136,43 +150,42 @@ public class OkHttpRequest extends IHttpRequest {
         }
     }
 
-    public <T> void sendSuccessResultCallback( HttpResult<T> data,  ICallBack callBack) {
-        ICallManager.sendSuccess(data, callBack);
-        ICallManager.sendComplete(callBack);
+    public <T> void sendSuccessResultCallback(ReqResult<T> data, ICallBack callBack) {
+        CallManager.sendSuccess(data, callBack);
+        CallManager.sendComplete(callBack);
     }
 
-    public void sendFailResultCallback( Exception e,  ICallBack callBack) {
-        ICallManager.sendFail(e, callBack);
-        ICallManager.sendComplete(callBack);
+    public void sendFailResultCallback(Exception e, ICallBack callBack) {
+        LogUtils.e(TAG, e.getMessage());
+        CallManager.sendFail(e, callBack);
+        CallManager.sendComplete(callBack);
     }
 
     private <T> void request(final String tag, final String url, final Map<String, String> params, final ICallBack<T> callback, Request request) {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                RequestManager.getInstance().removeReq(tag, url, params);
-                sendFailResultCallback(e, callback);
+                ReqManager.getInstance().removeReq(tag, url, params);
+                sendFailResultCallback(HttpExpFactory.handleException(e), callback);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                LogUtils.e("onResponse", response.toString());
-                RequestManager.getInstance().removeReq(tag, url, params);
-                int responseCode = response.code();
-                if (responseCode != 404 && responseCode < 500) {
+            public void onResponse(Call call, Response response) {
+                ReqManager.getInstance().removeReq(tag, url, params);
+                if (response.isSuccessful()) {
                     if (callback != null) {
                         try {
-                            HttpResult<T> data = callback.convertSuccess(response.body());
+                            ReqResult<T> data = callback.convertSuccess(response.body());
                             sendSuccessResultCallback(data, callback);
                         } catch (Exception e) {
-                            sendFailResultCallback(e, callback);
+                            sendFailResultCallback(HttpExpFactory.handleException(e), callback);
                         }
                     }
                 } else {
-                    sendFailResultCallback(new Exception(response.toString()), callback);
+                    HttpException httpException = new HttpException(retrofit2.Response.error(response.body(), response));
+                    sendFailResultCallback(HttpExpFactory.handleException(httpException), callback);
                 }
             }
         });
     }
-
 }

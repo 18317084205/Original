@@ -1,13 +1,13 @@
 package com.jianbo.toolkit.permission;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.jianbo.toolkit.prompt.LogUtils;
-import com.jianbo.toolkit.prompt.SPUtils;
+import com.jianbo.toolkit.prompt.DefSharedPreImp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * Created by Jianbo on 2018/3/29.
  */
-
 public class PermissionUtils {
     public static final String TAG = PermissionUtils.class.getSimpleName();
     private static final int REQUEST_CODE = 0x200;
@@ -25,7 +24,7 @@ public class PermissionUtils {
     private static final int PERMISSION_BANNED = 4;
     private static PermissionsListener permissionsListener;
 
-    public static void checkPermissions(Activity activity, String[] permissions, PermissionsListener listener) {
+    public static void checkPermissions(Context activity, String[] permissions, PermissionsListener listener) {
         permissionsListener = listener;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             callbackRequestResult(PERMISSION_GRANTED, permissions);
@@ -34,11 +33,9 @@ public class PermissionUtils {
         List<String> denied = new ArrayList<>();
         List<String> banned = new ArrayList<>();
         for (String permission : permissions) {
-            LogUtils.d(TAG, "permission:" + permission + ";permissionCode:" + ContextCompat.checkSelfPermission(activity, permission));
             if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                LogUtils.d(TAG, "permission:" + permission + ";shouldShowRequest:" + ActivityCompat.shouldShowRequestPermissionRationale(activity, permission));
-                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission) &&
-                        SPUtils.getInstance(activity).getBoolean(TAG)) {
+                if (!ActivityCompat.shouldShowRequestPermissionRationale((Activity) activity, permission) &&
+                        DefSharedPreImp.getInstance(activity).getBoolean(TAG)) {
                     banned.add(permission);
                 } else {
                     denied.add(permission);
@@ -65,8 +62,6 @@ public class PermissionUtils {
     }
 
     public static void onRequestPermissionsResult(Activity activity, int requestCode, String[] permissions, int[] grantResults) {
-        LogUtils.d(TAG, "requestCode:" + requestCode + ";permissions:" + permissions + ";grantResults:" + grantResults);
-
         if (requestCode != REQUEST_CODE) {
             return;
         }
@@ -75,8 +70,6 @@ public class PermissionUtils {
             List<String> banned = new ArrayList<>();
             for (int j = 0; j < grantResults.length; j++) {
                 if (grantResults[j] != PackageManager.PERMISSION_GRANTED) {
-
-                    LogUtils.d(TAG, "permission:" + permissions[j] + ";;shouldShowRequest:" + ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[j]));
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[j])) {
                         banned.add(permissions[j]);
                     } else {
@@ -85,7 +78,7 @@ public class PermissionUtils {
                 }
             }
 
-            SPUtils.getInstance(activity).putBoolean(TAG, true);
+            DefSharedPreImp.getInstance(activity).putBoolean(TAG, true);
 
             if (!banned.isEmpty()) {
                 callbackRequestResult(PERMISSION_BANNED, banned.toArray(new String[banned.size()]));
@@ -107,7 +100,6 @@ public class PermissionUtils {
         if (permissionsListener == null) {
             return;
         }
-
         switch (permissionType) {
             case PERMISSION_UNTREATED:
                 permissionsListener.onPermissionUntreated(permissions);
@@ -123,6 +115,4 @@ public class PermissionUtils {
                 break;
         }
     }
-
-
 }

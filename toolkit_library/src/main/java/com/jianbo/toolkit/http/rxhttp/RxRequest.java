@@ -1,13 +1,15 @@
 package com.jianbo.toolkit.http.rxhttp;
 
-import android.support.v4.BuildConfig;
-
-import com.jianbo.toolkit.http.RequestManager;
-import com.jianbo.toolkit.http.callback.DefObserver;
+import com.jianbo.toolkit.BuildConfig;
+import com.jianbo.toolkit.http.ReqManager;
 import com.jianbo.toolkit.http.base.ICallBack;
-import com.jianbo.toolkit.http.base.IHttpRequest;
-import com.jianbo.toolkit.http.okhttp.HeaderInterceptor;
-import com.jianbo.toolkit.rxjava.RxUtils;
+import com.jianbo.toolkit.http.base.Request;
+import com.jianbo.toolkit.http.callback.BitmapCallback;
+import com.jianbo.toolkit.http.callback.DefObserver;
+import com.jianbo.toolkit.http.callback.FileCallback;
+import com.jianbo.toolkit.http.okhttp.PInterceptor;
+import com.jianbo.toolkit.prompt.LogUtils;
+import com.jianbo.toolkit.prompt.rxjava.RxUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +27,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Jianbo on 2018/4/10.
  */
 
-public abstract class RxHttpRequest extends IHttpRequest {
+public abstract class RxRequest extends Request {
+    private static final String TAG = RxRequest.class.getSimpleName();
     private OkHttpClient.Builder okHttpBuilder;
     private Retrofit.Builder retrofitBuilder;
     private RxService apiService;
 
-    public RxHttpRequest() {
+    public RxRequest() {
         okHttpBuilder = new OkHttpClient.Builder();
-        okHttpBuilder.addInterceptor(new HeaderInterceptor(header()));
+        okHttpBuilder.addInterceptor(new PInterceptor(commonHeaders()));
         okHttpBuilder.connectTimeout(connectTimeout(), TimeUnit.SECONDS);
         okHttpBuilder.readTimeout(readTimeOut(), TimeUnit.SECONDS);
         okHttpBuilder.writeTimeout(writeTimeout(), TimeUnit.SECONDS);
@@ -69,12 +72,7 @@ public abstract class RxHttpRequest extends IHttpRequest {
     }
 
     @Override
-    public String baseUrl() {
-        return "http://192.168.0.1/";
-    }
-
-    @Override
-    public Map<String, String> header() {
+    public Map<String, String> commonHeaders() {
         return new HashMap<>();
     }
 
@@ -82,50 +80,56 @@ public abstract class RxHttpRequest extends IHttpRequest {
         return GsonConverterFactory.create();
     }
 
-    protected <T> void post(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
+    @Override
+    public <T> void post(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
         post(tag, url, new HashMap<String, String>(), params, callback);
     }
 
     @Override
     public <T> void post(final String tag, final String url, Map<String, String> headers, final Map<String, String> params, ICallBack<T> callBack) {
+        if (isWay(tag, url, params)) return;
+        LogUtils.d(TAG, url);
         apiService.postResponse(url, headers, params)
                 .compose(RxUtils.<ResponseBody>observableTransformer())
                 .onErrorResumeNext(new RxFactory.HttpResponseFunc<ResponseBody>())
-                .subscribe(new DefObserver(tag, callBack){
+                .subscribe(new DefObserver(tag, callBack) {
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        RequestManager.getInstance().removeReq(tag, url, params);
+                        ReqManager.getInstance().removeReq(tag, url, params);
                     }
+
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        RequestManager.getInstance().removeReq(tag, url, params);
+                        ReqManager.getInstance().removeReq(tag, url, params);
                     }
                 });
     }
 
-    protected <T> void get(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
+    @Override
+    public <T> void get(String tag, String url, Map<String, String> params, ICallBack<T> callback) {
         get(tag, url, new HashMap<String, String>(), params, callback);
     }
 
     @Override
     public <T> void get(final String tag, final String url, Map<String, String> headers, final Map<String, String> params, ICallBack<T> callback) {
+        if (isWay(tag, url, params)) return;
         apiService.getResponse(url, headers, params)
                 .compose(RxUtils.<ResponseBody>observableTransformer())
                 .onErrorResumeNext(new RxFactory.HttpResponseFunc<ResponseBody>())
-                .subscribe(new DefObserver<T>(tag, callback){
+                .subscribe(new DefObserver<T>(tag, callback) {
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        RequestManager.getInstance().removeReq(tag, url, params);
+                        ReqManager.getInstance().removeReq(tag, url, params);
                     }
 
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        RequestManager.getInstance().removeReq(tag, url, params);
+                        ReqManager.getInstance().removeReq(tag, url, params);
                     }
                 });
     }
@@ -133,32 +137,47 @@ public abstract class RxHttpRequest extends IHttpRequest {
 
     @Override
     public <T> void get(final String url, ICallBack<T> callback) {
+        if (isWay(url)) return;
         apiService.get(url)
                 .compose(RxUtils.<ResponseBody>observableTransformer())
                 .onErrorResumeNext(new RxFactory.HttpResponseFunc<ResponseBody>())
-                .subscribe(new DefObserver(url, callback){
+                .subscribe(new DefObserver(url, callback) {
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
-                        RequestManager.getInstance().removeRequest(url);
+                        ReqManager.getInstance().removeRequest(url);
                     }
+
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        RequestManager.getInstance().removeRequest(url);
+                        ReqManager.getInstance().removeRequest(url);
                     }
-                });;
+                });
+    }
+
+
+    @Override
+    public void download(String url, FileCallback callback) {
+        get(url, callback);
+    }
+
+    @Override
+    public void bitmap(String url, BitmapCallback callback) {
+        get(url, callback);
     }
 
     @Override
     public void cancel(String tag) {
-        RxRequestManager.rxCancel(tag);
+        super.cancel(tag);
+        RxReqManager.rxCancel(tag);
     }
 
     @Override
     public void cancelAll() {
-        RxRequestManager.rxCancelAll();
+        super.cancelAll();
+        RxReqManager.rxCancelAll();
     }
 
 }
