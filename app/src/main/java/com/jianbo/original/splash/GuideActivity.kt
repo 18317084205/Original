@@ -11,15 +11,50 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.jianbo.original.R
+import com.jianbo.original.base.BaseActivity
 import com.jianbo.original.home.HomeActivity
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
+import com.jianbo.toolkit.base.BasePresenter
 import com.jianbo.toolkit.prompt.DensityUtils
 import com.jianbo.toolkit.prompt.StatusBarUtils
 import java.util.*
 
 
-class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListener, ViewPager.OnPageChangeListener {
+class GuideActivity : BaseActivity(), ViewTreeObserver.OnGlobalLayoutListener, ViewPager.OnPageChangeListener {
+    override fun initViewOrData(savedInstanceState: Bundle?) {
+        viewpager = findViewById(R.id.viewPager)
+        relatively = findViewById(R.id.relativeLayout)
+        linearly = findViewById(R.id.linearLayout)
 
+        winthrop = DensityUtils.dip2px(this, 10F);
+        for (i in 0 until 5) {
+            val view = View(this)
+            view.setBackgroundColor(Color.WHITE)
+            list.add(view)
+            //加载下边的正常状态的圆点
+            initNormalPoint(i)
+        }
+        //加载下边的选中状态的圆点
+        initBluepoint()
+        viewpager!!.adapter = ViewPagerAdapter(list)
+        viewpager!!.addOnPageChangeListener(this)
+
+        findViewById<Button>(R.id.guide_start).setOnClickListener {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        }
+    }
+
+    override fun getPresenter(): BasePresenter<*, *>? {
+        return null
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.activity_guide
+    }
+
+    override fun <D : Any?> showDataFromPresenter(data: D) {
+    }
 
     private var viewpager: ViewPager? = null
     private var relatively: RelativeLayout? = null
@@ -54,35 +89,6 @@ class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListen
             findViewById<Button>(R.id.guide_start).visibility = View.GONE;
         }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        StatusBarUtils.with(this, 0, true);
-        setContentView(R.layout.activity_guide)
-        super.onCreate(savedInstanceState)
-        viewpager = findViewById(R.id.viewPager)
-        relatively = findViewById(R.id.relativeLayout)
-        linearly = findViewById(R.id.linearLayout)
-
-        winthrop = DensityUtils.dip2px(this, 10F);
-        for (i in 0 until 5) {
-            val view = View(this)
-            view.setBackgroundColor(Color.WHITE)
-            list.add(view)
-            //加载下边的正常状态的圆点
-            initNormalPoint(i)
-        }
-        //加载下边的选中状态的圆点
-        initBluepoint()
-        viewpager!!.adapter = ViewPagerAdapter(list)
-        viewpager!!.addOnPageChangeListener(this)
-
-        findViewById<Button>(R.id.guide_start).setOnClickListener {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-        }
-
-    }
-
 
     private fun initNormalPoint(i: Int) {
         val point = View(this)

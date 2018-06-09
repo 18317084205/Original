@@ -22,7 +22,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public abstract class JBaseActivity<D, P extends BasePresenter> extends AppCompatActivity implements PermissionView {
+public abstract class JBaseActivity<P extends BasePresenter> extends AppCompatActivity implements PermissionView {
 
     private PermissionPresenter permissionPresenter;
     protected P iPresenter;
@@ -33,6 +33,7 @@ public abstract class JBaseActivity<D, P extends BasePresenter> extends AppCompa
         setContentView(getLayoutId());
         StatusBarUtils.with(this).init();
         iPresenter = getPresenter();
+        initViewOrData(savedInstanceState);
     }
 
 
@@ -72,6 +73,8 @@ public abstract class JBaseActivity<D, P extends BasePresenter> extends AppCompa
     protected abstract P getPresenter();
 
     protected abstract int getLayoutId();
+
+    protected abstract void initViewOrData(Bundle savedInstanceState);
 
     protected ActivityUtils.SkipFactory createActivity(Class clazz) {
         return new ActivityUtils.SkipFactory(this, clazz);

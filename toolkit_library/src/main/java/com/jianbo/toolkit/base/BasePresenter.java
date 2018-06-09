@@ -1,6 +1,6 @@
 package com.jianbo.toolkit.base;
 
-public abstract class BasePresenter<D, T extends BaseView<D>> extends IPresenter {
+public abstract class BasePresenter<D, T extends BaseView> extends IPresenter {
     protected T view;
 
     protected boolean notNullViewImp() {
