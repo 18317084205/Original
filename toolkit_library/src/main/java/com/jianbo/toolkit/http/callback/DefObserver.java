@@ -6,6 +6,7 @@ import com.jianbo.toolkit.http.base.ICallBack;
 import com.jianbo.toolkit.http.rxhttp.HttpExpFactory;
 import com.jianbo.toolkit.http.rxhttp.RxReqManager;
 import com.jianbo.toolkit.prompt.AppUtils;
+import com.jianbo.toolkit.prompt.LogUtils;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -28,6 +29,7 @@ public abstract class DefObserver<T> implements Observer<ResponseBody> {
 
     @Override
     public void onNext(ResponseBody responseBody) {
+        LogUtils.e("onNext", responseBody.contentType() + "");
         if (AppUtils.isNotNull(callBack)) {
             try {
                 ReqResult<T> result = callBack.convertSuccess(responseBody);

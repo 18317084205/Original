@@ -12,12 +12,15 @@ import java.io.InputStreamReader;
 
 public class FileUtils {
     public static File getAlbumStorageDir(String fileName) {
-        // Get the directory for the user's public pictures directory.
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.
                 DIRECTORY_DOWNLOADS), fileName);//参数是文件名称
 
         if (!file.exists()) {
-            file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }
@@ -26,7 +29,11 @@ public class FileUtils {
         // Get the directory for the user's public pictures directory.
         File file = new File(parent, fileName);//参数2是文件名称
         if (!file.exists()) {
-            file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }

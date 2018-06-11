@@ -9,6 +9,7 @@ import com.jianbo.toolkit.http.execption.HttpThrowable;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 
@@ -32,7 +33,8 @@ public class HttpExpFactory {
     private static final int SERVICE_UNAVAILABLE = 503;
     private static final int GATEWAY_TIMEOUT = 504;
     private static final int ACCESS_DENIED = 302;
-    private static final int HANDEL_ERRROR = 417;
+    private static final int HANDEL_ERROR = 417;
+    private static final int FILE_ERROR = 3000;
 
     private static int code = -1;
 
@@ -69,7 +71,7 @@ public class HttpExpFactory {
                 case ACCESS_DENIED:
                     ex = "网络错误";
                     break;
-                case HANDEL_ERRROR:
+                case HANDEL_ERROR:
                     ex = "接口处理失败";
                     break;
                 default:
@@ -113,11 +115,14 @@ public class HttpExpFactory {
             ex = "类型转换出错";
             code = ERROR.FORMAT_ERROR;
         } else if (e instanceof NullPointerException) {
-            ex = "数据有空";
+            ex = "数据为空";
             code = ERROR.NULL;
         } else if (e instanceof UnknownHostException) {
             ex = "服务器地址未找到,请检查网络或Url";
             code = NOT_FOUND;
+        } else if (e instanceof IOException) {
+            ex = "文件不存在";
+            code = FILE_ERROR;
         } else {
             ex = e.getMessage();
             code = ERROR.UNKNOWN;

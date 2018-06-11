@@ -31,12 +31,12 @@ public class RxFactory {
         return BitmapFactory.decodeStream(response.byteStream());
     }
 
-    public static File transformFile(ResponseBody response, String fileDir, String fileName, final ICallBack<String> callBack) throws Exception {
+    public static String transformFile(ResponseBody response, String fileDir, String fileName, final ICallBack<String> callBack) throws Exception {
         String type = "." + response.contentType().subtype();
         if (TextUtils.isEmpty(fileName)) {
             fileName = System.currentTimeMillis() + type;
         }
-        LogUtils.d("fileName", fileName);
+        LogUtils.d(TAG, "fileName: " + fileName);
 
         byte[] buf = new byte[4096];
         int len = 0;
@@ -47,13 +47,13 @@ public class RxFactory {
             final long total = response.contentLength();
             long sum = 0;
             File file;
-            if (TextUtils.isEmpty(fileDir)) {
+            if (fileDir.isEmpty()) {
                 file = FileUtils.getAlbumStorageDir(fileName);
             } else {
                 file = FileUtils.getAlbumStorageDir(fileDir, fileName);
             }
 
-            LogUtils.d("fileDir", file.getAbsolutePath());
+            LogUtils.d(TAG, "fileDir:" + file.getAbsolutePath());
 
             fos = new FileOutputStream(file);
             while ((len = is.read(buf)) != -1) {
@@ -63,23 +63,13 @@ public class RxFactory {
                 CallManager.sendProgress(finalSum * 1.0f / total, finalSum, total, callBack);
             }
             fos.flush();
-            ReqResult<String> result = new ReqResult<>();
-            result.setCode(0);
-            result.setData(file.getAbsolutePath());
-            CallManager.sendSuccess(result, callBack);
-            return file;
+            return file.getAbsolutePath();
         } catch (IOException e) {
-            CallManager.sendFail(e, callBack);
+            CallManager.sendFail(HttpExpFactory.handleException(e), callBack);
             return null;
         } finally {
-            if (is != null) try {
-                is.close();
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            FileUtils.closeCloseable(is);
+            FileUtils.closeCloseable(fos);
         }
     }
 

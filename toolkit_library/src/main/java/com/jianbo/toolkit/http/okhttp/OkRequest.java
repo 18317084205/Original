@@ -44,7 +44,7 @@ public abstract class OkRequest extends com.jianbo.toolkit.http.base.Request {
 
         if (BuildConfig.DEBUG) {
             httpClient.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS));
-            httpClient.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
+//            httpClient.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
         }
         okHttpClient = httpClient.build();
         baseUrl = baseUrl();

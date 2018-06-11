@@ -41,7 +41,7 @@ public abstract class RxRequest extends Request {
         okHttpBuilder.writeTimeout(writeTimeout(), TimeUnit.SECONDS);
 
         if (BuildConfig.DEBUG) {
-            okHttpBuilder.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS));
+//            okHttpBuilder.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS));
             okHttpBuilder.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
         }
 
@@ -138,6 +138,7 @@ public abstract class RxRequest extends Request {
     @Override
     public <T> void get(final String url, ICallBack<T> callback) {
         if (isWay(url)) return;
+        LogUtils.e(TAG, "get:" + url);
         apiService.get(url)
                 .compose(RxUtils.<ResponseBody>observableTransformer())
                 .onErrorResumeNext(new RxFactory.HttpResponseFunc<ResponseBody>())
@@ -160,6 +161,7 @@ public abstract class RxRequest extends Request {
 
     @Override
     public void download(String url, FileCallback callback) {
+        LogUtils.e(TAG, "download:" + url);
         get(url, callback);
     }
 
