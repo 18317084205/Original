@@ -37,7 +37,6 @@ public class RxFactory {
             fileName = System.currentTimeMillis() + type;
         }
         LogUtils.d(TAG, "fileName: " + fileName);
-
         byte[] buf = new byte[4096];
         int len = 0;
         FileOutputStream fos = null;
@@ -48,7 +47,7 @@ public class RxFactory {
             long sum = 0;
             File file;
             if (fileDir.isEmpty()) {
-                file = FileUtils.getAlbumStorageDir(fileName);
+                file = FileUtils.getAlbumStorageFile(fileName);
             } else {
                 file = FileUtils.getAlbumStorageDir(fileDir, fileName);
             }

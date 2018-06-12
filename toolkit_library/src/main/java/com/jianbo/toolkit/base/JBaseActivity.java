@@ -69,6 +69,9 @@ public abstract class JBaseActivity<P extends BasePresenter> extends AppCompatAc
             iPresenter.unSubmersible();
         }
     }
+    protected <T extends View> T initViewById(int id) {
+        return (T) super.findViewById(id);
+    }
 
     protected abstract P getPresenter();
 

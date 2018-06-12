@@ -11,10 +11,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class FileUtils {
-    public static File getAlbumStorageDir(String fileName) {
+    public static File getAlbumStorageFile(String fileName) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.
                 DIRECTORY_DOWNLOADS), fileName);//参数是文件名称
-
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -26,14 +25,21 @@ public class FileUtils {
     }
 
     public static File getAlbumStorageDir(String parent, String fileName) {
-        // Get the directory for the user's public pictures directory.
-        File file = new File(parent, fileName);//参数2是文件名称
+        File file = new File(getAlbumStorageFolder(parent), fileName);
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        return file;
+    }
+
+    public static File getAlbumStorageFolder(String parent) {
+        File file = new File(parent);
+        if (!file.exists()) {
+            file.mkdirs();
         }
         return file;
     }

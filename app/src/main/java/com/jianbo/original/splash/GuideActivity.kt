@@ -20,8 +20,24 @@ import com.jianbo.toolkit.prompt.StatusBarUtils
 import java.util.*
 
 
-class GuideActivity : BaseActivity(), ViewTreeObserver.OnGlobalLayoutListener, ViewPager.OnPageChangeListener {
-    override fun initViewOrData(savedInstanceState: Bundle?) {
+class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListener, ViewPager.OnPageChangeListener {
+
+    private var viewpager: ViewPager? = null
+    private var relatively: RelativeLayout? = null
+    private var linearly: LinearLayout? = null
+    private var point_blue: View? = null
+    private var pointParams: RelativeLayout.LayoutParams? = null
+    private var leftMax: Int = 0
+    private var winthrop: Int = 0
+
+    private var list = ArrayList<View>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_guide)
+        StatusBarUtils.with(this)
+                .setThemeColor(Color.GRAY)
+                .useDarkTextColor(true).init()
         viewpager = findViewById(R.id.viewPager)
         relatively = findViewById(R.id.relativeLayout)
         linearly = findViewById(R.id.linearLayout)
@@ -45,26 +61,6 @@ class GuideActivity : BaseActivity(), ViewTreeObserver.OnGlobalLayoutListener, V
         }
     }
 
-    override fun getPresenter(): BasePresenter<*, *>? {
-        return null
-    }
-
-    override fun getLayoutId(): Int {
-        return R.layout.activity_guide
-    }
-
-    override fun <D : Any?> showDataFromPresenter(data: D) {
-    }
-
-    private var viewpager: ViewPager? = null
-    private var relatively: RelativeLayout? = null
-    private var linearly: LinearLayout? = null
-    private var point_blue: View? = null
-    private var pointParams: RelativeLayout.LayoutParams? = null
-    private var leftMax: Int = 0
-    private var winthrop: Int = 0
-
-    private var list = ArrayList<View>()
 
     override fun onGlobalLayout() {
         point_blue!!.viewTreeObserver.removeGlobalOnLayoutListener(this);

@@ -50,7 +50,6 @@ class MainActivity : BaseActivity() {
 
         checkPermissions(*permissions)
 
-
         button.setOnClickListener {
             //https://www.baidu.com/s?ie=utf-8&f=3&rsv_bp=1&tn=baidu&wd=%E5%8F%8C%E8%89%B2%E7%90%83
             LogUtils.e("OnClick")
@@ -75,23 +74,42 @@ class MainActivity : BaseActivity() {
 
             })
         }
+        button2.setOnClickListener {
+            HttpRequest.getInstance().bitmap(url1, object : BitmapCallback() {
+                override fun onSuccess(code: Int, result: Bitmap?, msg: String?) {
+                    if (result == null) return
+                    imageView.setImageBitmap(result)
+                }
+            })
+        }
+
+        button3.setOnClickListener{
+            HttpRequest.getInstance().cancel(url)
+            HttpRequest.getInstance().cancel(url1)
+        }
     }
 
     override fun <D : Any?> showDataFromPresenter(data: D) {
 
     }
+
     override fun onResume() {
         super.onResume()
         if (isOpenedSettings) {
             checkPermissions(*permissions)
         }
     }
+
     companion object {
         init {
             System.loadLibrary("native-lib")
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        HttpRequest.getInstance().cancelAll()
+    }
 
 }
 
