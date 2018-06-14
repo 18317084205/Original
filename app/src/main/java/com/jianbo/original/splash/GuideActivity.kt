@@ -15,6 +15,7 @@ import com.jianbo.original.base.BaseActivity
 import com.jianbo.original.home.HomeActivity
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
 import com.jianbo.toolkit.base.BasePresenter
+import com.jianbo.toolkit.prompt.ActivityUtils
 import com.jianbo.toolkit.prompt.DensityUtils
 import com.jianbo.toolkit.prompt.StatusBarUtils
 import java.util.*
@@ -56,7 +57,7 @@ class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListen
         viewpager!!.addOnPageChangeListener(this)
 
         findViewById<Button>(R.id.guide_start).setOnClickListener {
-            startActivity(Intent(this, HomeActivity::class.java))
+            ActivityUtils.SkipFactory(this, HomeActivity::class.java).start()
             finish()
         }
     }

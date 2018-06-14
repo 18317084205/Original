@@ -7,6 +7,12 @@ import android.content.Context;
  */
 
 public class DensityUtils {
+
+    public static int getWidthPixels(Context context){
+        final float scale = context.getResources().getDisplayMetrics().widthPixels;
+        return (int) scale;
+    }
+
     /**
      * 描述：根据手机分辨率把dip转换成px像素
      */
