@@ -1,9 +1,16 @@
 package com.jianbo.toolkit.prompt;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+
+import com.jianbo.toolkit.R;
 
 public class DrawableUtils {
     /**
@@ -63,5 +70,30 @@ public class DrawableUtils {
         Drawable.ConstantState state = drawable.getConstantState();
         // 对drawable 进行重新实例化、包装、可变操作
         return DrawableCompat.wrap(state == null ? drawable : state.newDrawable()).mutate();
+    }
+
+    /**
+     * 生成状态选择器
+     */
+    public static Drawable generatePressedSelector(int normalColor, int pressedColor) {
+        Drawable pressed = new ColorDrawable(pressedColor);
+        Drawable normal = new ColorDrawable(normalColor);
+        return generatePressedSelector(pressed, normal);
+    }
+
+    /**
+     * 生成状态选择器
+     */
+    public static Drawable generatePressedSelector(Drawable normal, Drawable pressed) {
+        StateListDrawable drawable = new StateListDrawable();
+        drawable.addState(new int[]{android.R.attr.state_pressed}, pressed);
+        drawable.addState(new int[]{}, normal);
+        //根据SDK版本设置状态选择器过度动画/渐变选择器/渐变动画
+        if (Build.VERSION.SDK_INT > 10) {
+            drawable.setEnterFadeDuration(500);
+            drawable.setExitFadeDuration(500);
+        }
+
+        return drawable;
     }
 }

@@ -20,7 +20,7 @@ public class SystemUtils {
     public static boolean isMIUI() {
         Properties prop = new Properties();
         try {
-            prop.load(new FileInputStream(new File(Environment.getRootDirectory(), "build.prop")));
+            prop.load(new FileInputStream(new File(Environment.getRootDirectory(), "create.prop")));
         } catch (IOException e) {
             e.printStackTrace();
         }

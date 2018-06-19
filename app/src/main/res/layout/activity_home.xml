@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,21 +21,24 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@+id/navigationView_top"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/navigationView_top" />
 
-    <com.jianbo.toolkit.widget.NavigationView
+    <com.jianbo.toolkit.widget.JTabLayout
         android:id="@+id/navigationView"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tab:icon_selected="@color/colorAccent"
+        tab:icon_unSelected="@color/colorPrimary"
+        tab:title_selected="@color/colorAccent"
+        tab:title_unSelected="@color/colorPrimary" />
 
-    <com.jianbo.toolkit.widget.NavigationView
+    <com.jianbo.toolkit.widget.JTabLayout
         android:id="@+id/navigationView_top"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toTopOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

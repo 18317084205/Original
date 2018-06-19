@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="JTabLayout">
+        <attr name="icon_unSelected" format="color"/>
+        <attr name="icon_selected" format="color"/>
+        <attr name="title_unSelected" format="color"/>
+        <attr name="title_selected" format="color"/>
+    </declare-styleable>
+</resources>

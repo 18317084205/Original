@@ -2,6 +2,7 @@ package com.jianbo.toolkit.widget;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -16,60 +17,55 @@ import com.jianbo.toolkit.R;
 import com.jianbo.toolkit.prompt.DrawableUtils;
 import com.jianbo.toolkit.prompt.ViewUtils;
 
-public class NavigationMenu extends Menu {
+public class NavigationMenu extends Menu implements View.OnClickListener {
 
     private ImageView menu_icon;
     private TextView menu_title;
     private TextView menu_badge;
-    private int icon_unSelected = Color.GRAY;
-    private int icon_selected = Color.BLACK;
+    private Drawable icon_unSelected;
+    private Drawable icon_selected;
     private int title_unSelected = Color.GRAY;
     private int title_selected = Color.BLACK;
-    private boolean selected;
-    private Drawable icon;
-    private String title = "";
     private int mode = MODE_VERTICAL;
 
-    public NavigationMenu(@NonNull Context context) {
-        super(context);
+    @Override
+    public void setClickListener(OnClickListener listener) {
+        clickListener = listener;
+    }
+
+    public static NavigationMenu newInstance(Context context, String title, int imgId) {
+        return new NavigationMenu(context, title, imgId);
+    }
+
+    public static NavigationMenu newInstance(Context context, int strId, int imgId) {
+        return new NavigationMenu(context, context.getString(strId), imgId);
+    }
+
+    private NavigationMenu(@NonNull Context context, String title, int imgId) {
+        super(context, title, imgId);
         setGravity(Gravity.CENTER);
     }
 
     @Override
-    public void build() {
+    public void create() {
+        if (icon != null && icon_unSelected == null && icon_selected == null) {
+            icon_unSelected = DrawableUtils.tintDrawable(icon, Color.GRAY);
+            icon_selected = DrawableUtils.tintDrawable(icon, Color.BLACK);
+        }
         View view = LayoutInflater.from(getContext()).inflate(
                 mode == MODE_VERTICAL ? R.layout.navigation_menu_vertical : R.layout.navigation_menu_horizontal, null);
         menu_icon = ViewUtils.findViewById(view, R.id.navigation_icon);
         menu_title = ViewUtils.findViewById(view, R.id.navigation_title);
         menu_badge = ViewUtils.findViewById(view, R.id.navigation_badge);
         LayoutParams itemParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        LayoutParams itemParams = new LayoutParams(mode == MODE_VERTICAL ?
-//                ViewGroup.LayoutParams.WRAP_CONTENT : ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         addView(view, itemParams);
+        view.setOnClickListener(this);
         refreshMenu();
     }
 
     @Override
-    public Menu setIcon(int resId) {
-        icon = ContextCompat.getDrawable(getContext(), resId);
-        return this;
-    }
-
-    @Override
-    public Menu setTitle(String title) {
-        this.title = title;
-        return this;
-    }
-
-    @Override
-    public Menu setTitle(int strId) {
-        this.title = getContext().getString(strId);
-        return this;
-    }
-
-    @Override
     public Menu setChecked(boolean checked) {
-        selected = checked;
+        isChecked = checked;
         return this;
     }
 
@@ -77,13 +73,10 @@ public class NavigationMenu extends Menu {
     public void refreshMenu() {
         if (menu_title != null) {
             menu_title.setText(title);
-            menu_title.setTextColor(selected ? title_selected : title_unSelected);
+            menu_title.setTextColor(isChecked ? title_selected : title_unSelected);
         }
         if (menu_icon != null && icon != null) {
-            Drawable fIcon = DrawableUtils.tintDrawable(icon, selected ?
-                    icon_selected :
-                    icon_unSelected);
-            menu_icon.setImageDrawable(fIcon);
+            menu_icon.setImageDrawable(isChecked ? icon_selected : icon_unSelected);
         }
     }
 
@@ -95,8 +88,17 @@ public class NavigationMenu extends Menu {
 
     @Override
     public Menu setIconColor(int unSelectedColor, int selectedColor) {
-        icon_unSelected = unSelectedColor;
-        icon_selected = selectedColor;
+        if (icon != null) {
+            icon_unSelected = DrawableUtils.tintDrawable(icon, unSelectedColor);
+            icon_selected = DrawableUtils.tintDrawable(icon, selectedColor);
+        }
+        return this;
+    }
+
+    @Override
+    public Menu setIcon(int unSelectedImgId, int selectedImgId) {
+        icon_unSelected = ContextCompat.getDrawable(getContext(), unSelectedImgId);
+        icon_selected = ContextCompat.getDrawable(getContext(), selectedImgId);
         return this;
     }
 
@@ -119,4 +121,10 @@ public class NavigationMenu extends Menu {
         }
     }
 
+    @Override
+    public void onClick(View view) {
+        if (clickListener != null) {
+            clickListener.onClick(this);
+        }
+    }
 }
