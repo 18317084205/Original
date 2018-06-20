@@ -4,6 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Original.iml" filepath="$PROJECT_DIR$/Original.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jhttp/jhttp.iml" filepath="$PROJECT_DIR$/jhttp/jhttp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jpermission/jpermission.iml" filepath="$PROJECT_DIR$/jpermission/jpermission.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jstatusbar/jstatusbar.iml" filepath="$PROJECT_DIR$/jstatusbar/jstatusbar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jtablayout/jtablayout.iml" filepath="$PROJECT_DIR$/jtablayout/jtablayout.iml" />
       <module fileurl="file://$PROJECT_DIR$/toolkit_library/toolkit_library.iml" filepath="$PROJECT_DIR$/toolkit_library/toolkit_library.iml" />
     </modules>
   </component>

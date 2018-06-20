@@ -1,7 +1,7 @@
 package com.jianbo.original.http;
 
-import com.jianbo.toolkit.http.okhttp.OkRequest;
-import com.jianbo.toolkit.http.rxhttp.RxRequest;
+
+import com.liang.jhttp.okhttp.OkRequest;
 
 /**
  * Created by Jianbo on 2018/4/12.

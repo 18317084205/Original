@@ -7,20 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.jianbo.toolkit.permission.presenter.PermissionPresenter;
-import com.jianbo.toolkit.permission.view.PermissionView;
 import com.jianbo.toolkit.prompt.ActivityUtils;
 import com.jianbo.toolkit.prompt.AppUtils;
-import com.jianbo.toolkit.prompt.StatusBarUtils;
 import com.jianbo.toolkit.prompt.ToastUtils;
 import com.jianbo.toolkit.prompt.WindowUtils;
-import com.jianbo.toolkit.prompt.rxjava.RxUtils;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import com.liang.jpermission.presenter.PermissionPresenter;
+import com.liang.jpermission.view.PermissionView;
+import com.liang.jstatusbar.JStatusBar;
 
 public abstract class JBaseActivity<P extends BasePresenter> extends AppCompatActivity implements PermissionView {
 
@@ -31,9 +24,10 @@ public abstract class JBaseActivity<P extends BasePresenter> extends AppCompatAc
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
-        StatusBarUtils.with(this).init();
+        JStatusBar.with(this).init();
         iPresenter = getPresenter();
         initViewOrData(savedInstanceState);
+        //930086807
     }
 
 
@@ -87,19 +81,6 @@ public abstract class JBaseActivity<P extends BasePresenter> extends AppCompatAc
     public void onPermissionDenied() {
         finish();
     }
-
-    public void showKeyboard() {
-        Disposable disposable = Observable.timer(300, TimeUnit.MILLISECONDS)
-                .compose(RxUtils.<Long>observableTransformer())
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        WindowUtils.showSoftKeyboard(JBaseActivity.this);
-                    }
-                });
-        RxUtils.addDisposable(this, disposable);
-    }
-
     public void showToast(String msg) {
         ToastUtils.showToast(this, msg);
     }

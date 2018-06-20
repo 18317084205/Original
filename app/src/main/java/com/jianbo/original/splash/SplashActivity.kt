@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.jianbo.toolkit.prompt.WindowUtils
-import com.jianbo.toolkit.prompt.rxjava.RxUtils
+import com.liang.jhttp.utils.RxUtils
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit

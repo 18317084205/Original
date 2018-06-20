@@ -1,7 +1,8 @@
 package com.jianbo.original.splash
 
-import android.content.Intent
+import android.annotation.TargetApi
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
@@ -11,13 +12,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.jianbo.original.R
-import com.jianbo.original.base.BaseActivity
 import com.jianbo.original.home.HomeActivity
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
-import com.jianbo.toolkit.base.BasePresenter
 import com.jianbo.toolkit.prompt.ActivityUtils
 import com.jianbo.toolkit.prompt.DensityUtils
-import com.jianbo.toolkit.prompt.StatusBarUtils
+import com.liang.jstatusbar.JStatusBar
 import java.util.*
 
 
@@ -36,7 +35,7 @@ class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guide)
-        StatusBarUtils.with(this)
+        JStatusBar.with(this)
                 .setThemeColor(Color.GRAY)
                 .useDarkTextColor(true).init()
         viewpager = findViewById(R.id.viewPager)
@@ -63,8 +62,9 @@ class GuideActivity : AppCompatActivity(), ViewTreeObserver.OnGlobalLayoutListen
     }
 
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onGlobalLayout() {
-        point_blue!!.viewTreeObserver.removeGlobalOnLayoutListener(this);
+        point_blue!!.viewTreeObserver.removeOnGlobalLayoutListener(this);
         leftMax = linearly!!.getChildAt(1).left - linearly!!.getChildAt(0).left;
     }
 

@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigationView_top" />
 
-    <com.jianbo.toolkit.widget.JTabLayout
+    <com.liang.jtablayout.JTabLayout
         android:id="@+id/navigationView"
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -35,7 +35,7 @@
         tab:title_selected="@color/colorAccent"
         tab:title_unSelected="@color/colorPrimary" />
 
-    <com.jianbo.toolkit.widget.JTabLayout
+    <com.liang.jtablayout.JTabLayout
         android:id="@+id/navigationView_top"
         android:layout_width="match_parent"
         android:layout_height="40dp"

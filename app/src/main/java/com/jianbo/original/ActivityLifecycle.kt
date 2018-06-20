@@ -3,7 +3,7 @@ package com.jianbo.original
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.jianbo.toolkit.prompt.rxjava.RxUtils
+import com.liang.jhttp.utils.RxUtils
 
 /**
  * Created by Jianbo on 2018/5/3.

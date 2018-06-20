@@ -1,1 +1,1 @@
-include ':app', ':toolkit_library'
+include ':app', ':toolkit_library', ':jtablayout', ':jhttp', ':jpermission', ':jstatusbar'

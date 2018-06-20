@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="JTabLayout">
+        <attr name="icon_unSelected" format="color"/>
+        <attr name="icon_selected" format="color"/>
+        <attr name="title_unSelected" format="color"/>
+        <attr name="title_selected" format="color"/>
+
+        <attr name="selectedPosition" format="integer"/>
+        <attr name="isScroller" format="boolean"/>
+        <attr name="showIndicator" format="boolean"/>
+        <attr name="indicatorHeight" format="dimension"/>
+        <attr name="indicatorColor" format="color"/>
+
+    </declare-styleable>
+</resources>

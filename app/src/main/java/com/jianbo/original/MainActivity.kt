@@ -3,24 +3,13 @@ package com.jianbo.original
 import android.Manifest
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import com.jianbo.original.R.id.*
 import com.jianbo.original.base.BaseActivity
 import com.jianbo.toolkit.base.BasePresenter
-import com.jianbo.toolkit.http.HttpRequest
-import com.jianbo.toolkit.http.callback.BitmapCallback
-import com.jianbo.toolkit.http.callback.FileCallback
-import com.jianbo.toolkit.http.callback.HttpCallback
-import com.jianbo.toolkit.permission.PermissionUtils
-import com.jianbo.toolkit.permission.PermissionsListener
-import com.jianbo.toolkit.prompt.AppUtils
-import com.jianbo.toolkit.prompt.DialogUtils
 import com.jianbo.toolkit.prompt.LogUtils
-import com.jianbo.toolkit.prompt.ToastUtils
-import com.jianbo.toolkit.widget.DialogBuilder
-import com.tamic.novate.Novate
+import com.liang.jhttp.JHttp
+import com.liang.jhttp.callback.BitmapCallback
+import com.liang.jhttp.callback.FileCallback
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 import java.util.*
 
 class MainActivity : BaseActivity() {
@@ -57,7 +46,7 @@ class MainActivity : BaseActivity() {
             val parameters = HashMap<String, String>()
             parameters.put("wd", "java")
 
-            HttpRequest.getInstance().download(url, object : FileCallback() {
+            JHttp.getInstance().download(url, object : FileCallback() {
                 override fun onSuccess(code: Int, result: String?, msg: String?) {
                     if (result == null) return
                     LogUtils.e("55555.abc", result)
@@ -75,7 +64,7 @@ class MainActivity : BaseActivity() {
             })
         }
         button2.setOnClickListener {
-            HttpRequest.getInstance().bitmap(url1, object : BitmapCallback() {
+            JHttp.getInstance().bitmap(url1, object : BitmapCallback() {
                 override fun onSuccess(code: Int, result: Bitmap?, msg: String?) {
                     if (result == null) return
                     imageView.setImageBitmap(result)
@@ -84,8 +73,8 @@ class MainActivity : BaseActivity() {
         }
 
         button3.setOnClickListener{
-            HttpRequest.getInstance().cancel(url)
-            HttpRequest.getInstance().cancel(url1)
+            JHttp.getInstance().cancel(url)
+            JHttp.getInstance().cancel(url1)
         }
     }
 
@@ -108,7 +97,7 @@ class MainActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        HttpRequest.getInstance().cancelAll()
+        JHttp.getInstance().cancelAll()
     }
 
 }
