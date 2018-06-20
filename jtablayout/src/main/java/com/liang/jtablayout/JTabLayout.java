@@ -31,6 +31,7 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
     private int position = 0;
 
     private int selectedPosition;
+    private int checkPosition;
 
     private boolean isScroller;
     private boolean showIndicator;
@@ -40,11 +41,12 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
 
     private ValueAnimator mIndicatorAnimator;
 
-    private int mIndicatorLeft = -1;
-    private int mIndicatorRight = -1;
+    private int tabWidth;
 
     private MenuView.OnTabChangeListener changeListener;
     private String TAG = "JTabLayout";
+    private int lastScrollX = 0;
+    private float xOffset;
 
     public JTabLayout(Context context) {
         this(context, null);
@@ -72,7 +74,7 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         title_unSelected = typedArray.getColor(R.styleable.JTabLayout_title_unSelected, 0);
         title_selected = typedArray.getColor(R.styleable.JTabLayout_title_selected, 0);
 
-        selectedPosition = typedArray.getInt(R.styleable.JTabLayout_selectedPosition, -1);
+        selectedPosition = typedArray.getInt(R.styleable.JTabLayout_selectedPosition, 0);
         isScroller = typedArray.getBoolean(R.styleable.JTabLayout_isScroller, false);
         showIndicator = typedArray.getBoolean(R.styleable.JTabLayout_showIndicator, false);
         indicatorColor = typedArray.getColor(R.styleable.JTabLayout_indicatorColor, Color.GRAY);
@@ -125,6 +127,39 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         super.onLayout(changed, left, top, right, bottom);
     }
 
+    private void animateIndicatorToPosition() {
+
+        if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
+            mIndicatorAnimator.cancel();
+        }
+        mIndicatorAnimator = new ValueAnimator();
+        mIndicatorAnimator.setInterpolator(new FastOutSlowInInterpolator());
+        mIndicatorAnimator.setDuration(200);
+        mIndicatorAnimator.setFloatValues(0, 1);
+        mIndicatorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+//                final float fraction = animator.getAnimatedFraction();
+                xOffset = animator.getAnimatedFraction();
+                Log.e(TAG, "addUpdateListener xOffset: " + xOffset);
+                updateIndicatorPosition();
+            }
+        });
+
+        mIndicatorAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                selectedPosition = checkPosition;
+                xOffset = 0f;
+            }
+        });
+        mIndicatorAnimator.start();
+    }
+
+    private void updateIndicatorPosition() {
+        ViewCompat.postInvalidateOnAnimation(this);
+    }
+
     public void setScroller(boolean isScroller) {
         this.isScroller = isScroller;
     }
@@ -157,8 +192,6 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
     }
 
 
-
-
     @Override
     public void onClick(Menu menu) {
         if (menu.isChecked) {
@@ -180,7 +213,7 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
                 }
                 if (menu == child) {
                     child.setChecked(true);
-                    selectedPosition = child.position;
+                    checkPosition = child.position;
                 } else {
                     if (!child.isChecked) {
                         continue;
@@ -190,17 +223,8 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
                 }
                 child.refreshMenu();
             }
-        }
-//        invalidate();
-        updateIndicatorPosition();
-        if (isScroller && tabsContainer.getChildCount() > 0) {
-            int newScrollX = menu.getLeft();
-            Log.e(TAG, "menu.getLeft: " + menu.getLeft());
-            /**HorizontalScrollView移动到当前tab,并居中*/
-            newScrollX -= getWidth() / 2 - getPaddingLeft();
-            Log.e(TAG, "newScrollX: " + newScrollX);
-            newScrollX += ((menu.getRight() - menu.getLeft()) / 2);
-            scrollTo(newScrollX, 0);
+            scrollTab(menu.position, 1);
+            animateIndicatorToPosition();
         }
 
         if (changeListener != null) {
@@ -208,106 +232,18 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         }
     }
 
-
-    private void updateIndicatorPosition() {
-        Log.e(TAG, "selectedPosition: " + selectedPosition);
-       View selectedTitle = tabsContainer.getChildAt(selectedPosition);
-        int left, right;
-        if (selectedTitle != null && selectedTitle.getWidth() > 0) {
-            Log.e(TAG, "selectedTitle: " + selectedTitle.getLeft());
-            left = selectedTitle.getLeft();
-            right = selectedTitle.getRight();
-
-            if (selectedPosition < tabsContainer.getChildCount() - 1) {
-                // Draw the selection partway between the tabs
-                View nextTitle = tabsContainer.getChildAt(selectedPosition + 1);
-                left = nextTitle.getLeft() + left;
-                right = nextTitle.getRight() + right;
+    private void scrollTab(int position, int offset) {
+        if (isScroller && tabsContainer.getChildCount() > 0) {
+            int newScrollX;
+            View childView = tabsContainer.getChildAt(position);
+            newScrollX = childView.getLeft() + offset;
+            if (position > 0 || offset > 0) {
+                newScrollX -= getWidth() / 2 - childView.getWidth() / 2;
             }
-        } else {
-            left = right = -1;
-        }
-
-        setIndicatorPosition(left, right);
-    }
-
-    private void setIndicatorPosition(int left, int right) {
-        if (left != mIndicatorLeft || right != mIndicatorRight) {
-            // If the indicator's left/right has changed, invalidate
-            mIndicatorLeft = left;
-            mIndicatorRight = right;
-            ViewCompat.postInvalidateOnAnimation(this);
-        }
-    }
-
-    private int dpToPx(int dps) {
-        return Math.round(getResources().getDisplayMetrics().density * dps);
-    }
-
-    private void animateIndicatorToPosition(final int position, int duration) {
-        if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
-            mIndicatorAnimator.cancel();
-        }
-
-        final boolean isRtl = ViewCompat.getLayoutDirection(this)
-                == ViewCompat.LAYOUT_DIRECTION_RTL;
-
-        final View targetView = getChildAt(position);
-        if (targetView == null) {
-            // If we don't have a view, just update the position now and return
-            updateIndicatorPosition();
-            return;
-        }
-
-        final int targetLeft = targetView.getLeft();
-        final int targetRight = targetView.getRight();
-        final int startLeft;
-        final int startRight;
-
-        if (Math.abs(position - selectedPosition) <= 1) {
-            // If the views are adjacent, we'll animate from edge-to-edge
-            startLeft = mIndicatorLeft;
-            startRight = mIndicatorRight;
-        } else {
-            // Else, we'll just grow from the nearest edge
-            final int offset = dpToPx(24);
-            if (position < selectedPosition) {
-                // We're going end-to-start
-                if (isRtl) {
-                    startLeft = startRight = targetLeft - offset;
-                } else {
-                    startLeft = startRight = targetRight + offset;
-                }
-            } else {
-                // We're going start-to-end
-                if (isRtl) {
-                    startLeft = startRight = targetRight + offset;
-                } else {
-                    startLeft = startRight = targetLeft - offset;
-                }
+            if (newScrollX != lastScrollX) {
+                lastScrollX = newScrollX;
+                scrollTo(newScrollX, 0);
             }
-        }
-
-        if (startLeft != targetLeft || startRight != targetRight) {
-            ValueAnimator animator = mIndicatorAnimator = new ValueAnimator();
-            animator.setInterpolator(new FastOutSlowInInterpolator());
-            animator.setDuration(duration);
-            animator.setFloatValues(0, 1);
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    final float fraction = animator.getAnimatedFraction();
-                    setIndicatorPosition(startLeft + Math.round(fraction * (targetLeft - startLeft)),
-                            startLeft + Math.round(fraction * (targetLeft - startLeft)));
-                }
-            });
-            animator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animator) {
-//                    selectedPosition = position;
-                }
-            });
-            animator.start();
         }
     }
 
@@ -321,19 +257,36 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         }
 
         int height = getHeight();
-        View tab = tabsContainer.getChildAt(selectedPosition);
+        View tab = tabsContainer.getChildAt(checkPosition);
         for (int i = 0; i < tabsContainer.getChildCount(); i++) {
             Menu child = (Menu) tabsContainer.getChildAt(i);
             if (child.isChecked) {
                 tab = child;
             }
         }
-        if (mIndicatorLeft >= 0 && mIndicatorRight > mIndicatorLeft) {
-//            canvas.drawRect(tab.getLeft(), height - indicatorHeight, tab.getRight(), height, indicatorPaint);
-            Log.e(TAG, "mIndicatorLeft: " + mIndicatorLeft);
-            Log.e(TAG, "mIndicatorRight: " + mIndicatorRight);
-            canvas.drawRect(mIndicatorLeft, height - indicatorHeight, mIndicatorLeft, height, indicatorPaint);
+//        if (mIndicatorLeft >= 0 && mIndicatorRight > mIndicatorLeft) {
+////            canvas.drawRect(tab.getLeft(), height - indicatorHeight, tab.getRight(), height, indicatorPaint);
+//            Log.e(TAG, "mIndicatorLeft: " + mIndicatorLeft);
+//            Log.e(TAG, "mIndicatorRight: " + mIndicatorRight);
+//            canvas.drawRect(mIndicatorLeft, height - indicatorHeight, mIndicatorLeft, height, indicatorPaint);
+//        }
+        if (tab != null) {
+            tabWidth = tab.getWidth();
+            Log.e(TAG, "draw tabWidth: " + tabWidth);
+            Log.e(TAG, "draw tabWidth z: " + tab.getMeasuredWidth());
+            int indicatorWidth = tabWidth / 2;
+            Log.e(TAG, "draw indicatorWidth: " + indicatorWidth);
+            int left = 0;
+            if (checkPosition > selectedPosition) {
+                left = (int) (tabWidth / 4 + selectedPosition * tabWidth + xOffset * tabWidth * (checkPosition - selectedPosition));
+            } else {
+                left = (int) (tabWidth / 4 + selectedPosition * tabWidth - xOffset * tabWidth * (selectedPosition - checkPosition));
+            }
+
+            Log.e(TAG, "draw left: " + left);
+            canvas.drawRect(left, height - indicatorHeight, left + indicatorWidth, height, indicatorPaint);
         }
+
     }
 
     private class SlidingTabStrip extends LinearLayout {
