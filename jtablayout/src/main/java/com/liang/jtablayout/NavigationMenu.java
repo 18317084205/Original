@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.ViewUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,12 +59,6 @@ public class NavigationMenu extends Menu implements View.OnClickListener {
         addView(view, itemParams);
         view.setOnClickListener(this);
         refreshMenu();
-    }
-
-    @Override
-    public Menu setChecked(boolean checked) {
-        isChecked = checked;
-        return this;
     }
 
     @Override

@@ -27,8 +27,6 @@ public abstract class Menu extends RelativeLayout {
         this.icon = ContextCompat.getDrawable(context, imgId);
     }
 
-    public abstract Menu setChecked(boolean checked);
-
     public abstract void refreshMenu();
 
     public abstract Menu setMode(int mode);
