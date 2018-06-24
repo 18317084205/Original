@@ -14,22 +14,35 @@
         android:background="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/navigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button4" />
     <!--<View-->
-        <!--android:id="@+id/view_line_top"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:background="@color/colorPrimary"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/navigationView_top" />-->
+    <!--android:id="@+id/view_line_top"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:background="@color/colorPrimary"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/navigationView_top" />-->
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button4"
+        app:layout_constraintTop_toBottomOf="@+id/navigationView_top"
+        app:layout_constraintVertical_weight="1">
+
+    </android.support.v4.view.ViewPager>
 
     <com.liang.jtablayout.JTabLayout
         android:id="@+id/navigationView"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_line"
         tab:icon_selected="@color/colorAccent"
         tab:icon_unSelected="@color/colorPrimary"
         tab:title_selected="@color/colorAccent"
@@ -46,15 +59,17 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Button"
-        app:layout_constraintBottom_toBottomOf="@+id/navigationView"
+        app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/viewPager" />
 
     <com.liang.jtablayout.JTabLayout
         android:id="@+id/navigationView_top"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/viewPager"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

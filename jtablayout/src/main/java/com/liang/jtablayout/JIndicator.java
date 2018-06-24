@@ -8,11 +8,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 
 public class JIndicator extends Indicator {
-    private Rect mIndicatorRect = new Rect();
-    private GradientDrawable mIndicatorDrawable = new GradientDrawable();
     private Paint indicatorPaint;
-    private Paint mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Paint mTrianglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Path trianglePath;
     private int gravity = Gravity.BOTTOM;
 
@@ -26,6 +22,11 @@ public class JIndicator extends Indicator {
     public void setType(int type) {
         this.type = type;
         reInitIndicator();
+    }
+
+    @Override
+    public void setWidthScale(float scale) {
+        this.widthScale = scale;
     }
 
     public void setGravity(int gravity) {
@@ -67,6 +68,9 @@ public class JIndicator extends Indicator {
         }
 
         if (type == TYPE_TRIANGLE) {
+            if (width <= 0) {
+                return;
+            }
             trianglePath = new Path();
             trianglePath.moveTo(0, 0);
             trianglePath.lineTo(width, 0);
@@ -80,24 +84,41 @@ public class JIndicator extends Indicator {
     }
 
     @Override
-    public void draw(Canvas canvas, float left, int tabHeight) {
+    public void draw(Canvas canvas, float left, float right, int tabHeight) {
         if (type == TYPE_LINE) {
             if (gravity == Gravity.TOP) {
-                canvas.drawLine(left, 0, left + width, 0, indicatorPaint);
-            }else {
-                canvas.drawLine(left, tabHeight, left + width, tabHeight, indicatorPaint);
+                canvas.drawLine(left, 0, right, 0, indicatorPaint);
+            } else {
+                canvas.drawLine(left, tabHeight, right, tabHeight, indicatorPaint);
             }
         }
 
         if (type == TYPE_TRIANGLE) {
-            if (gravity == Gravity.TOP) {
-                canvas.translate(left, 0);
-            }else {
-                canvas.translate(left, tabHeight);
+            if (width <= 0) {
+                if (trianglePath == null) {
+                    trianglePath = new Path();
+                }
+                float triangleWidth = right - left;
+                trianglePath.reset();
+                trianglePath.moveTo(0, 0);
+                trianglePath.lineTo(triangleWidth, 0);
+                if (gravity == Gravity.TOP) {
+                    trianglePath.lineTo(triangleWidth / 2, height);
+                    trianglePath.close();
+                    canvas.translate(left, 0);
+                } else {
+                    trianglePath.lineTo(triangleWidth / 2, -height);
+                    trianglePath.close();
+                    canvas.translate(left, tabHeight);
+                }
+            } else {
+                if (gravity == Gravity.TOP) {
+                    canvas.translate(left, 0);
+                } else {
+                    canvas.translate(left, tabHeight);
+                }
             }
             canvas.drawPath(trianglePath, indicatorPaint);
         }
     }
-
-
 }

@@ -3,6 +3,7 @@ package com.jianbo.original
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import com.jianbo.toolkit.prompt.ToastUtils
 import com.liang.jhttp.utils.RxUtils
 
 /**
@@ -20,6 +21,7 @@ object ActivityLifecycle : Application.ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(activity: Activity?) {
         RxUtils.removeDisposable(activity)
+        ToastUtils.cancelToast()
     }
 
     override fun onActivitySaveInstanceState(activity: Activity?, p1: Bundle?) {

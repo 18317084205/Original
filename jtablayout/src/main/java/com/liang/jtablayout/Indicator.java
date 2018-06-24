@@ -8,20 +8,15 @@ public abstract class Indicator {
     public static final int TYPE_RECT = 1;
     public static final int TYPE_TRIANGLE = 2;
     protected int type = TYPE_LINE;
-    protected int width = 0;
-    protected int height = 10;
+    protected float widthScale = 0.5f;
+    protected int width = -1;
+    protected int height = 20;
     protected int radius = 0;
     protected int color = Color.GRAY;
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
     public abstract void setType(int type);
+
+    public abstract void setWidthScale(float scale);
 
     public abstract void setWidth(int width);
 
@@ -32,5 +27,5 @@ public abstract class Indicator {
     public abstract void setColor(int color);
 
     //    public abstract void draw(Canvas canvas, float left, float top, float right, float bottom);
-    public abstract void draw(Canvas canvas, float left, int tabHeight);
+    public abstract void draw(Canvas canvas, float left, float right, int tabHeight);
 }

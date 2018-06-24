@@ -8,9 +8,9 @@
 
         <attr name="selectedPosition" format="integer"/>
         <attr name="isScroller" format="boolean"/>
-        <attr name="showIndicator" format="boolean"/>
-        <attr name="indicatorHeight" format="dimension"/>
-        <attr name="indicatorColor" format="color"/>
+        <attr name="dividerWidth" format="dimension"/>
+        <attr name="dividerHeight" format="dimension"/>
+        <attr name="dividerColor" format="color"/>
 
     </declare-styleable>
 </resources>
