@@ -14,7 +14,6 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
@@ -70,13 +69,13 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
 
     public JTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setFillViewport(true);
-        setWillNotDraw(false);
-        setClipChildren(false);
-        setClipToPadding(false);
+        super.setFillViewport(true);
+        super.setWillNotDraw(false);
+        super.setClipChildren(false);
         tabsContainer = new LinearLayout(context);
-        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        addView(tabsContainer, params);
+        tabsContainer.setClipChildren(false);
+        super.addView(tabsContainer, 0, new HorizontalScrollView.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.JTabLayout,
                 defStyleAttr, 0);
@@ -93,6 +92,7 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
 
         dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
+
 
     public void addTab(Menu menu) {
         if (title_unSelected != 0 && title_selected != 0) {
@@ -292,7 +292,7 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         if (viewPager != null) {
             if (viewPager.getCurrentItem() != position) {
                 viewPager.setCurrentItem(position);
-            }else {
+            } else {
                 if (changeListener != null) {
                     changeListener.onChanged(selectedPosition);
                 }

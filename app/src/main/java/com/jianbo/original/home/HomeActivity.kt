@@ -4,19 +4,17 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import com.jianbo.original.R
-import com.jianbo.original.R.id.*
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
 import com.jianbo.toolkit.prompt.ToastUtils
 import com.liang.jtablayout.*
 import kotlinx.android.synthetic.main.activity_home.*
-import java.util.ArrayList
+import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -80,15 +78,25 @@ class HomeActivity : AppCompatActivity() {
                 Toast.makeText(this@HomeActivity, "navigationView_top onClick: $position", Toast.LENGTH_SHORT).show()
             }
         })
-
+        tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+        tabLayout.setTabTextColors(Color.BLACK, Color.RED);
         for (i in 0 until 7) {
             list.add(layoutInflater.inflate(R.layout.flash_one,null))
         }
 
-
+        tabLayout.addTab(tabLayout.newTab().setText("Tab1"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab123123123"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab2"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab123123123"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab2"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab123123123"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab2"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab123123123"))
+        tabLayout.addTab(tabLayout.newTab().setText("Tab2"))
 
         viewPager.adapter = ViewPagerAdapter(list)
 //        navigationView.setViewPager(viewPager)
         navigationView_top.setViewPager(viewPager)
+        tabLayout.setupWithViewPager(viewPager)
     }
 }

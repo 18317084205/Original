@@ -29,5 +29,12 @@ class ViewPagerAdapter(private val views: List<View>) : PagerAdapter() {
         return view === `object`
     }
 
+    override fun getPageTitle(position: Int): CharSequence? {
+        if (position % 2 > 0) {
+            return "Tabasdasdasdasd$position"
+        }
+        return "Tab$position"
+    }
+
 
 }
