@@ -2,13 +2,13 @@ package com.liang.jtablayout.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
-import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
 
 import com.liang.jtablayout.Indicator;
@@ -20,7 +20,7 @@ public class SlidingTabStrip extends LinearLayout {
     private float mSelectionOffset;
     private int mIndicatorLeft;
     private int mIndicatorRight;
-    private Interpolator interpolator = new FastOutSlowInInterpolator();
+    private TimeInterpolator interpolator = new FastOutSlowInInterpolator();
     private Indicator indicator;
 
     public SlidingTabStrip(Context context) {
@@ -29,7 +29,7 @@ public class SlidingTabStrip extends LinearLayout {
     }
 
 
-    boolean childrenNeedLayout() {
+    public boolean childrenNeedLayout() {
         for (int i = 0, z = getChildCount(); i < z; i++) {
             final View child = getChildAt(i);
             if (child.getWidth() <= 0) {
