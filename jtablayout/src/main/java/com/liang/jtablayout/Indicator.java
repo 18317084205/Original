@@ -26,6 +26,30 @@ public abstract class Indicator {
 
     public abstract void setColor(int color);
 
+    public int getType() {
+        return type;
+    }
+
+    public float getWidthScale() {
+        return widthScale;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
     //    public abstract void draw(Canvas canvas, float left, float top, float right, float bottom);
     public abstract void draw(Canvas canvas, float left, float right, int tabHeight);
 }

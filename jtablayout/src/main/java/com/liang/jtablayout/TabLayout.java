@@ -1,7 +1,6 @@
 package com.liang.jtablayout;
 
 import android.animation.Animator;
-import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -10,11 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.Pools;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
+import com.liang.jtablayout.listener.TabPageChangeListener;
 import com.liang.jtablayout.view.JTabView;
 import com.liang.jtablayout.view.SlidingTabStrip;
 import com.liang.jtablayout.view.TabView;
@@ -35,15 +36,10 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     private OnTabSelectedListener mSelectedListener;
     private ValueAnimator mScrollAnimator;
 
-    private ViewPager mViewPager;
-
     private SlidingTabStrip mTabStrip;
 
     private int mMode = MODE_SCROLLABLE;
-
     private TabView mSelectedTab;
-    private TimeInterpolator interpolator;
-
     private ColorStateList mTabTextColors;
     private ColorStateList mTabIconColors;
 
@@ -51,6 +47,8 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     private int mTabPaddingTop = 0;
     private int mTabPaddingEnd = 10;
     private int mTabPaddingBottom = 0;
+    private ViewPager viewPager;
+    private TabPageChangeListener tabPageChangeListener;
 
     public interface OnTabSelectedListener {
 
@@ -96,6 +94,10 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
                 child.requestLayout();
             }
         }
+    }
+
+    public void setIndicator(Indicator indicator) {
+        mTabStrip.setIndicator(indicator);
     }
 
     private void updateTabViewLayoutParams(LinearLayout.LayoutParams lp) {
@@ -239,11 +241,11 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
         mSelectedTab = null;
     }
 
-    void selectTab(TabView tab) {
+    public void selectTab(TabView tab) {
         selectTab(tab, true);
     }
 
-    void selectTab(TabView tab, boolean updateIndicator) {
+    private void selectTab(TabView tab, boolean updateIndicator) {
         final TabView currentTab = mSelectedTab;
 
         if (currentTab == tab) {
@@ -257,7 +259,7 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
                 if ((currentTab == null || currentTab.getPosition() == TabView.INVALID_POSITION)
                         && newPosition != TabView.INVALID_POSITION) {
                     // If we don't currently have a tab, just draw the interpolator
-                    setScrollPosition(newPosition, 0f, true);
+                    setScrollPosition(newPosition, newPosition, 0f, true);
                 } else {
                     animateToTab(newPosition);
                 }
@@ -285,20 +287,21 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
         }
     }
 
-    public void setScrollPosition(int position, float positionOffset, boolean updateSelectedText) {
-        setScrollPosition(position, positionOffset, updateSelectedText, true);
+    public void setScrollPosition(int position, int newPosition, float positionOffset, boolean updateSelectedText) {
+        setScrollPosition(position, newPosition, positionOffset, updateSelectedText, true);
     }
 
-    public void setScrollPosition(int position, float positionOffset, boolean updateSelectedText,
+    public void setScrollPosition(int position, int newPosition, float positionOffset, boolean updateSelectedText,
                                   boolean updateIndicatorPosition) {
         final int roundedPosition = Math.round(position + positionOffset);
         if (roundedPosition < 0 || roundedPosition >= mTabStrip.getChildCount()) {
             return;
         }
 
+
         // Set the interpolator position, if enabled
         if (updateIndicatorPosition) {
-            mTabStrip.setIndicatorPositionFromTabPosition(position, positionOffset);
+            mTabStrip.setIndicatorPositionFromTabPosition(position, newPosition, positionOffset);
         }
 
         // Now update the scroll position, canceling any running animation
@@ -311,10 +314,6 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
         if (updateSelectedText) {
             setSelectedTabView(roundedPosition);
         }
-    }
-
-    private float getScrollPosition() {
-        return mTabStrip.getIndicatorPosition();
     }
 
     public int getSelectedTabPosition() {
@@ -330,7 +329,7 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
                 || mTabStrip.childrenNeedLayout()) {
             // If we don't have a window token, or we haven't been laid out yet just draw the new
             // position now
-            setScrollPosition(newPosition, 0f, true);
+            setScrollPosition(newPosition, newPosition, 0f, true);
             return;
         }
 
@@ -351,7 +350,7 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     private void ensureScrollAnimator() {
         if (mScrollAnimator == null) {
             mScrollAnimator = new ValueAnimator();
-            mScrollAnimator.setInterpolator(interpolator);
+            mScrollAnimator.setInterpolator(new FastOutSlowInInterpolator());
             mScrollAnimator.setDuration(ANIMATION_DURATION);
             mScrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -462,6 +461,23 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     public void onClick(View v) {
         if (v instanceof TabView) {
             selectTab((TabView) v);
+        }
+    }
+
+    public void setupWithViewPager(@Nullable ViewPager viewPager) {
+        if (this.viewPager != null) {
+            // If we've already been setup with a ViewPager, remove us from it
+            if (tabPageChangeListener != null) {
+                this.viewPager.removeOnPageChangeListener(tabPageChangeListener);
+            }
+//            if (mAdapterChangeListener != null) {
+//                mViewPager.removeOnAdapterChangeListener(mAdapterChangeListener);
+//            }
+        }
+        this.viewPager = viewPager;
+        if (this.viewPager != null) {
+            tabPageChangeListener = new TabPageChangeListener(this);
+            this.viewPager.addOnPageChangeListener(tabPageChangeListener);
         }
     }
 }

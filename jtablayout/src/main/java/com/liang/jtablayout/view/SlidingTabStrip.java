@@ -17,10 +17,10 @@ public class SlidingTabStrip extends LinearLayout {
 
     private ValueAnimator mIndicatorAnimator;
     private int mSelectedPosition;
-    private float mSelectionOffset;
     private int mIndicatorLeft;
     private int mIndicatorRight;
     private TimeInterpolator interpolator = new FastOutSlowInInterpolator();
+
     private Indicator indicator;
 
     public SlidingTabStrip(Context context) {
@@ -39,24 +39,27 @@ public class SlidingTabStrip extends LinearLayout {
         return false;
     }
 
-    public void setIndicatorPositionFromTabPosition(int position, float positionOffset) {
+    public void setIndicator(Indicator indicator) {
+        this.indicator = indicator;
+    }
+
+    public void setIndicatorPositionFromTabPosition(int position, int newPosition, float positionOffset) {
+        if (indicator == null) {
+            return;
+        }
         if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
             mIndicatorAnimator.cancel();
         }
-
         mSelectedPosition = position;
-        mSelectionOffset = positionOffset;
-        updateIndicatorPosition();
-    }
-
-    public float getIndicatorPosition() {
-        return mSelectedPosition + mSelectionOffset;
+        updateIndicatorPosition(position, newPosition, positionOffset);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-
+        if (indicator == null || !changed) {
+            return;
+        }
         if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
             // If we're currently running an animation, lets cancel it and start a
             // new animation with the remaining duration
@@ -66,87 +69,63 @@ public class SlidingTabStrip extends LinearLayout {
                     Math.round((1f - mIndicatorAnimator.getAnimatedFraction()) * duration));
         } else {
             // If we've been layed out, update the indicator position
-            updateIndicatorPosition();
+            updateIndicatorPosition(mSelectedPosition, -1, 0f);
         }
     }
 
-    private void updateIndicatorPosition() {
-        final View selectedTitle = getChildAt(mSelectedPosition);
-        int left, right;
-
-        if (selectedTitle != null && selectedTitle.getWidth() > 0) {
-            left = selectedTitle.getLeft();
-            right = selectedTitle.getRight();
-
-            if (mSelectionOffset > 0f && mSelectedPosition < getChildCount() - 1) {
-                // Draw the selection partway between the tabs
-                View nextTitle = getChildAt(mSelectedPosition + 1);
-                left = (int) (mSelectionOffset * nextTitle.getLeft() +
-                        (1.0f - mSelectionOffset) * left);
-                right = (int) (mSelectionOffset * nextTitle.getRight() +
-                        (1.0f - mSelectionOffset) * right);
-            }
-        } else {
-            left = right = -1;
+    private void updateIndicatorPosition(int position, int newPosition, float positionOffset) {
+        if (newPosition < 0) {
+            newPosition = position + 1;
         }
 
-        setIndicatorPosition(left, right);
+        View currentTab = getChildAt(position);
+        mIndicatorLeft = currentTab.getLeft();
+        mIndicatorRight = currentTab.getRight();
+
+        if (currentTab != null && currentTab.getWidth() > 0) {
+            int indicatorWidth = getIndicatorWidth(currentTab);
+            mIndicatorLeft += (currentTab.getWidth() - indicatorWidth) / 2;
+            mIndicatorRight = mIndicatorLeft + indicatorWidth;
+        }
+
+        if (newPosition < getChildCount() && newPosition != position) {
+            View nextTabView = getChildAt(newPosition);
+            int indicatorWidth = getIndicatorWidth(nextTabView);
+            int nextLeft = nextTabView.getLeft();
+            int nextRight;
+            nextLeft += (nextTabView.getWidth() - indicatorWidth) / 2;
+            nextRight = nextLeft + indicatorWidth;
+
+            mIndicatorLeft += ((nextLeft - mIndicatorLeft) * positionOffset);
+            mIndicatorRight += ((nextRight - mIndicatorRight) * positionOffset);
+        }
+
+        setIndicatorPosition();
     }
 
-    public void setIndicatorPosition(int left, int right) {
-        if (left != mIndicatorLeft || right != mIndicatorRight) {
-            // If the indicator's left/right has changed, invalidate
-            mIndicatorLeft = left;
-            mIndicatorRight = right;
-            ViewCompat.postInvalidateOnAnimation(this);
+    private int getIndicatorWidth(View currentTab) {
+        if (indicator == null) {
+            return 0;
         }
+        int indicatorWidth = indicator.getWidth();
+        if (indicatorWidth <= 0) {
+            indicatorWidth = (int) (currentTab.getWidth() * indicator.getWidthScale());
+        }
+        return indicatorWidth;
+    }
+
+    public void setIndicatorPosition() {
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public void animateIndicatorToPosition(final int position, int duration) {
-        if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
-            mIndicatorAnimator.cancel();
-        }
-
-        final boolean isRtl = ViewCompat.getLayoutDirection(this)
-                == ViewCompat.LAYOUT_DIRECTION_RTL;
-
-        final View targetView = getChildAt(position);
-        if (targetView == null) {
-            // If we don't have a view, just update the position now and return
-            updateIndicatorPosition();
+        if (indicator == null) {
             return;
         }
-
-        final int targetLeft = targetView.getLeft();
-        final int targetRight = targetView.getRight();
-        final int startLeft;
-        final int startRight;
-
-        if (Math.abs(position - mSelectedPosition) <= 1) {
-            // If the views are adjacent, we'll animate from edge-to-edge
-            startLeft = mIndicatorLeft;
-            startRight = mIndicatorRight;
-        } else {
-            // Else, we'll just grow from the nearest edge
-            final int offset = Math.round(getResources().getDisplayMetrics().density * 24);
-            if (position < mSelectedPosition) {
-                // We're going end-to-start
-                if (isRtl) {
-                    startLeft = startRight = targetLeft - offset;
-                } else {
-                    startLeft = startRight = targetRight + offset;
-                }
-            } else {
-                // We're going start-to-end
-                if (isRtl) {
-                    startLeft = startRight = targetRight + offset;
-                } else {
-                    startLeft = startRight = targetLeft - offset;
-                }
+        if (position != mSelectedPosition) {
+            if (mIndicatorAnimator != null && mIndicatorAnimator.isRunning()) {
+                mIndicatorAnimator.cancel();
             }
-        }
-
-        if (startLeft != targetLeft || startRight != targetRight) {
             ValueAnimator animator = mIndicatorAnimator = new ValueAnimator();
             animator.setInterpolator(interpolator);
             animator.setDuration(duration);
@@ -154,17 +133,14 @@ public class SlidingTabStrip extends LinearLayout {
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    final float fraction = animator.getAnimatedFraction();
-                    setIndicatorPosition(
-                            leap(startLeft, targetLeft, fraction),
-                            leap(startRight, targetRight, fraction));
+                    float fraction = animator.getAnimatedFraction();
+                    updateIndicatorPosition(mSelectedPosition, position, fraction);
                 }
             });
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animator) {
                     mSelectedPosition = position;
-                    mSelectionOffset = 0f;
                 }
             });
             animator.start();
@@ -174,13 +150,12 @@ public class SlidingTabStrip extends LinearLayout {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        if (isInEditMode() || getChildCount() <= 0) {
+            return;
+        }
         // Thick colored underline below the current selection
         if (indicator != null && mIndicatorLeft >= 0 && mIndicatorRight > mIndicatorLeft) {
             indicator.draw(canvas, mIndicatorLeft, mIndicatorRight, getHeight());
         }
-    }
-
-    public int leap(int startValue, int endValue, float fraction) {
-        return startValue + Math.round(fraction * (endValue - startValue));
     }
 }

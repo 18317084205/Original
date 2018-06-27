@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.design.widget.TabLayout
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.jianbo.original.R
@@ -84,18 +85,23 @@ class HomeActivity : AppCompatActivity() {
         for (i in 0 until 7) {
             list.add(layoutInflater.inflate(R.layout.flash_one, null))
             navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab$i"))
+            tabLayout.addTab(tabLayout.newTab().setText("Tab$i"))
         }
 
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab1"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
-        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
-
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab1"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
+//        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
+        var ind = JIndicator()
+//        ind.setType(Indicator.TYPE_TRIANGLE)
+        ind.setHeight(30)
+        ind.setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        navigationView_top.setIndicator(ind)
 
         tabLayout.addTab(tabLayout.newTab().setText("Tab1"))
         tabLayout.addTab(tabLayout.newTab().setText("Tab123123123"))
@@ -111,6 +117,7 @@ class HomeActivity : AppCompatActivity() {
 //        navigationView.setViewPager(viewPager)
 //        navigationView_top.setViewPager(viewPager)
         tabLayout.setupWithViewPager(viewPager)
+        navigationView_top.setupWithViewPager(viewPager)
 
     }
 }
