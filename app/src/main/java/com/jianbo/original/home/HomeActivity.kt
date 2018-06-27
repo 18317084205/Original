@@ -1,5 +1,6 @@
 package com.jianbo.original.home
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -7,13 +8,16 @@ import android.support.annotation.RequiresApi
 import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import com.jianbo.original.R
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
 import com.jianbo.toolkit.prompt.ToastUtils
+import com.liang.jtablayout.Indicator
 import com.liang.jtablayout.JIndicator
 import com.liang.jtablayout.JTabLayout
 import com.liang.jtablayout.NavigationMenu
+import com.liang.jtablayout.listener.OnTabSelectedListener
 import kotlinx.android.synthetic.main.activity_home.*
 import java.util.*
 
@@ -26,13 +30,13 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         navigationView.setIndicator(JIndicator())
-        navigationView.addTab(NavigationMenu.newInstance(this, "0001", android.R.drawable.ic_menu_camera))
-        navigationView.addTab(NavigationMenu.newInstance(this, "0002", android.R.drawable.ic_menu_share))
-        navigationView.addTab(NavigationMenu.newInstance(this, "0003", android.R.drawable.ic_menu_call))
-        navigationView.addTab(NavigationMenu.newInstance(this, "0004", android.R.drawable.ic_menu_camera))
-        navigationView.addTab(NavigationMenu.newInstance(this, "0005", android.R.drawable.ic_menu_agenda))
-        navigationView.addTab(NavigationMenu.newInstance(this, "0006", android.R.drawable.ic_menu_call))
-        navigationView.setCurrentTab(3)
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0001", android.R.drawable.ic_menu_camera))
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0002", android.R.drawable.ic_menu_share))
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0003", android.R.drawable.ic_menu_call))
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0004", android.R.drawable.ic_menu_camera))
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0005", android.R.drawable.ic_menu_agenda))
+//        navigationView.addTab(NavigationMenu.newInstance(this, "0006", android.R.drawable.ic_menu_call))
+//        navigationView.setCurrentTab(3)
 
         navigationView.setChangeListener(object : JTabLayout.OnTabListener {
             override fun onChanged(position: Int) {
@@ -79,13 +83,15 @@ class HomeActivity : AppCompatActivity() {
 //                Toast.makeText(this@HomeActivity, "navigationView_top onClick: $position", Toast.LENGTH_SHORT).show()
 //            }
 //        })
-        tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+        tabLayout.tabMode = TabLayout.MODE_FIXED
         tabLayout.setTabTextColors(Color.BLACK, Color.RED);
         navigationView_top.setTabTextColors(Color.BLACK, Color.RED);
-        for (i in 0 until 7) {
+        navigationView.setScroller(true)
+        for (i in 0 until 5) {
             list.add(layoutInflater.inflate(R.layout.flash_one, null))
             navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab$i"))
             tabLayout.addTab(tabLayout.newTab().setText("Tab$i"))
+            navigationView.addTab(NavigationMenu.newInstance(this, "Tab$i", android.R.drawable.ic_menu_camera))
         }
 
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab1"))
@@ -98,7 +104,7 @@ class HomeActivity : AppCompatActivity() {
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
         var ind = JIndicator()
-//        ind.setType(Indicator.TYPE_TRIANGLE)
+        ind.setType(Indicator.TYPE_TRIANGLE)
         ind.setHeight(30)
         ind.setColor(ContextCompat.getColor(this, R.color.colorPrimary))
         navigationView_top.setIndicator(ind)
@@ -119,5 +125,18 @@ class HomeActivity : AppCompatActivity() {
         tabLayout.setupWithViewPager(viewPager)
         navigationView_top.setupWithViewPager(viewPager)
 
+
+        navigationView_top.addOnTabSelectedListener(object :OnTabSelectedListener{
+            override fun onTabUnselected(tab: Int) {
+                Log.e("navigationView_top_OnTabSelectedListener", "onTabUnselected: ...$tab")
+            }
+            override fun onTabReselected(tab: Int) {
+                Log.e("navigationView_top_OnTabSelectedListener", "onTabReselected: ...$tab")
+            }
+            override fun onTabSelected(tab: Int) {
+                Log.e("navigationView_top_OnTabSelectedListener", "onTabSelected: ...$tab")
+            }
+
+        })
     }
 }

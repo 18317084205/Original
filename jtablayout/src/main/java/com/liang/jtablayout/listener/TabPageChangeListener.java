@@ -15,6 +15,7 @@ public class TabPageChangeListener implements ViewPager.OnPageChangeListener {
     private WeakReference<TabLayout> mTabLayoutRef;
     private int mPreviousScrollState;
     private int mScrollState;
+    private int selectedPosition;
 
     public TabPageChangeListener(TabLayout tabLayout) {
         this.mTabLayoutRef = new WeakReference<>(tabLayout);
@@ -22,7 +23,9 @@ public class TabPageChangeListener implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-         TabLayout tabLayout = mTabLayoutRef.get();
+        Log.e("TabPageChangeListener", "onPageScrolled: ..." + position);
+        selectedPosition = position;
+        TabLayout tabLayout = mTabLayoutRef.get();
         if (tabLayout != null) {
             // Only update the text selection if we're not settling, or we are settling after
             // being dragged
@@ -33,17 +36,18 @@ public class TabPageChangeListener implements ViewPager.OnPageChangeListener {
             // onPageSelected() instead.
             final boolean updateIndicator = !(mScrollState == SCROLL_STATE_SETTLING
                     && mPreviousScrollState == SCROLL_STATE_IDLE);
-            Log.e("onPageScrolled", "position: " + position + "positionOffset: " + positionOffset);
-            tabLayout.setScrollPosition(position, -1, positionOffset, updateText, updateIndicator);
+            tabLayout.setScrollPosition(position, positionOffset, updateText, updateIndicator);
         }
     }
 
     @Override
     public void onPageSelected(int position) {
-         TabLayout tabLayout = mTabLayoutRef.get();
-        if (tabLayout != null && tabLayout.getSelectedTabPosition() != position
+        Log.e("TabPageChangeListener", "onPageSelected: ..." + position);
+        TabLayout tabLayout = mTabLayoutRef.get();
+        if (mScrollState == SCROLL_STATE_IDLE && tabLayout != null && selectedPosition != position
                 && position < tabLayout.getTabCount()) {
-            tabLayout.selectTab(tabLayout.getTabAt(position));
+            tabLayout.dispatchTabUnselected(tabLayout.getTabAt(selectedPosition));
+            tabLayout.dispatchTabSelected(tabLayout.getTabAt(position));
         }
     }
 
