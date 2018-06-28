@@ -10,6 +10,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -68,10 +69,11 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
         setFillViewport(true);
         setHorizontalScrollBarEnabled(false);
         slidingTabStrip = new SlidingTabStrip(context);
-        addView(slidingTabStrip, new HorizontalScrollView.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        addView(slidingTabStrip, 0, new HorizontalScrollView.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
         updateTabViews(true);
     }
+
 
     public void setMode(int mode) {
         this.mode = mode;
@@ -87,6 +89,14 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     }
 
     public void updateTabViews(boolean requestLayout) {
+        switch (mode) {
+            case MODE_FIXED:
+                slidingTabStrip.setGravity(Gravity.CENTER);
+                break;
+            case MODE_SCROLLABLE:
+                slidingTabStrip.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                break;
+        }
         for (int i = 0; i < slidingTabStrip.getChildCount(); i++) {
             View child = slidingTabStrip.getChildAt(i);
             child.setPadding(tabPaddingStart, tabPaddingTop, tabPaddingEnd, tabPaddingBottom);
@@ -104,7 +114,7 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
     private void updateTabViewLayoutParams(LinearLayout.LayoutParams lp) {
         if (mode == MODE_FIXED) {
             lp.width = 0;
-            lp.weight = 1;
+            lp.weight = 1.0f;
         } else {
             lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
             lp.weight = 0;
@@ -507,5 +517,28 @@ public class TabLayout extends HorizontalScrollView implements View.OnClickListe
         previousScrollState = scrollState;
         scrollState = state;
         canScroll = state != SCROLL_STATE_IDLE;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (getChildCount() == 1) {
+            final View child = getChildAt(0);
+            boolean remeasure = false;
+            switch (mode) {
+                case MODE_SCROLLABLE:
+                    remeasure = child.getMeasuredWidth() < getMeasuredWidth();
+                    break;
+                case MODE_FIXED:
+                    remeasure = child.getMeasuredWidth() != getMeasuredWidth();
+                    break;
+            }
+
+            if (remeasure) {
+                int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                        getMeasuredWidth(), MeasureSpec.EXACTLY);
+                child.measure(childWidthMeasureSpec, heightMeasureSpec);
+            }
+        }
     }
 }

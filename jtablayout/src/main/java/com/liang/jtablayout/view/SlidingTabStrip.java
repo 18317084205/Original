@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -29,7 +28,6 @@ public class SlidingTabStrip extends LinearLayout {
         super(context);
         setWillNotDraw(false);
     }
-
 
     public boolean childrenNeedLayout() {
         for (int i = 0, z = getChildCount(); i < z; i++) {
@@ -57,6 +55,7 @@ public class SlidingTabStrip extends LinearLayout {
         mSelectionOffset = positionOffset;
         updateIndicatorPosition(-1);
     }
+
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -129,7 +128,7 @@ public class SlidingTabStrip extends LinearLayout {
                 mIndicatorAnimator.cancel();
             }
             ValueAnimator animator = mIndicatorAnimator = new ValueAnimator();
-            animator.setInterpolator(new FastOutSlowInInterpolator());
+            animator.setInterpolator(interpolator);
             animator.setDuration(duration);
             animator.setFloatValues(0, 1);
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

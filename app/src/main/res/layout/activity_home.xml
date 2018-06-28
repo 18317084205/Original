@@ -43,8 +43,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/button4"
-        app:layout_constraintTop_toBottomOf="@+id/viewPager"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/viewPager" />
 
 
     <com.liang.jtablayout.JTabLayout
@@ -75,11 +74,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewPager" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/navigationView_top"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal">
+
+    </LinearLayout>
+
     <com.liang.jtablayout.TabLayout
         android:id="@+id/navigationView_top"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="80dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/viewPager"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 </android.support.constraint.ConstraintLayout>

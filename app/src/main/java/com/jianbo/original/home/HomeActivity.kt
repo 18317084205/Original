@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import com.jianbo.original.R
 import com.jianbo.original.splash.adapter.ViewPagerAdapter
 import com.jianbo.toolkit.prompt.ToastUtils
@@ -86,14 +87,15 @@ class HomeActivity : AppCompatActivity() {
         tabLayout.tabMode = TabLayout.MODE_FIXED
         tabLayout.setTabTextColors(Color.BLACK, Color.RED);
         navigationView_top.setTabTextColors(Color.BLACK, Color.RED);
-        navigationView.setScroller(true)
-        for (i in 0 until 5) {
+        navigationView.setScroller(false)
+        for (i in 0 until 12) {
             list.add(layoutInflater.inflate(R.layout.flash_one, null))
             navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab$i"))
-            tabLayout.addTab(tabLayout.newTab().setText("Tab$i"))
+            tabLayout.addTab(tabLayout.newTab().setText("Tab$i+10"))
             navigationView.addTab(NavigationMenu.newInstance(this, "Tab$i", android.R.drawable.ic_menu_camera))
+            linearLayout.addView(navigationView_top.newTab().setTitle("Tab$i+10"), LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f))
         }
-
+        navigationView_top.setMode(TabLayout.MODE_FIXED)
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab1"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))

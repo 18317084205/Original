@@ -14,7 +14,6 @@ public abstract class TabView extends FrameLayout {
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
 
-    private Drawable icon;
     private CharSequence title;
     private CharSequence contentDesc;
     private int position = INVALID_POSITION;
@@ -27,31 +26,30 @@ public abstract class TabView extends FrameLayout {
     public TabView(Context context) {
         super(context);
         setClickable(true);
+        setFocusable(true);
     }
 
-    public void setTabPadding(int mTabPaddingStart,int mTabPaddingTop,int mTabPaddingEnd,int mTabPaddingBottom) {
+    public void setTabPadding(int mTabPaddingStart, int mTabPaddingTop, int mTabPaddingEnd, int mTabPaddingBottom) {
         ViewCompat.setPaddingRelative(this, mTabPaddingStart, mTabPaddingTop,
                 mTabPaddingEnd, mTabPaddingBottom);
     }
 
     public void reset() {
         setSelected(false);
-        icon = null;
         title = null;
         contentDesc = null;
         position = INVALID_POSITION;
         mode = VERTICAL;
     }
+
     public Drawable[] getIcons() {
         return icons;
     }
-    
-    public Drawable getDefaultIcon() {
-        return icon;
-    }
 
     public TabView setIcon(Drawable defaultIcon) {
-        this.icon = defaultIcon;
+        icons = new Drawable[2];
+        icons[0] = defaultIcon;
+        icons[1] = defaultIcon;
         return this;
     }
 
@@ -66,10 +64,11 @@ public abstract class TabView extends FrameLayout {
 
 
     public TabView setIconColor(ColorStateList iconColor) {
-        if (icon != null && iconColor != null) {
-            icons = new Drawable[2];
-            icons[0] = DrawableUtils.tintDrawable(icon, titleColor.getColorForState(EMPTY_STATE_SET, Color.GRAY));
-            icons[1] = DrawableUtils.tintDrawable(icon, titleColor.getColorForState(SELECTED_STATE_SET, Color.BLACK));
+        if (icons != null && iconColor != null) {
+            Drawable[] newIcons = new Drawable[2];
+            newIcons[0] = DrawableUtils.tintDrawable(icons[0], titleColor.getColorForState(EMPTY_STATE_SET, Color.GRAY));
+            newIcons[1] = DrawableUtils.tintDrawable(icons[1], titleColor.getColorForState(SELECTED_STATE_SET, Color.BLACK));
+            icons = newIcons;
         }
         return this;
     }

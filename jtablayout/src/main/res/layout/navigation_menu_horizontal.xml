@@ -15,6 +15,7 @@
         android:id="@+id/navigation_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/navigation_icon"
         android:text="56464"
