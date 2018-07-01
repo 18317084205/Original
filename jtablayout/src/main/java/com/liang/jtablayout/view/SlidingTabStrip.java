@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -27,6 +28,8 @@ public class SlidingTabStrip extends LinearLayout {
     public SlidingTabStrip(Context context) {
         super(context);
         setWillNotDraw(false);
+        setClipChildren(false);
+        setClipToPadding(false);
     }
 
     public boolean childrenNeedLayout() {
@@ -99,8 +102,34 @@ public class SlidingTabStrip extends LinearLayout {
             nextLeft += (nextTabView.getWidth() - indicatorWidth) / 2;
             nextRight = nextLeft + indicatorWidth;
 
-            left += ((nextLeft - left) * mSelectionOffset);
-            right += ((nextRight - right) * mSelectionOffset);
+            if (indicator.isTransitionScroll()) {
+                float offR = mSelectionOffset * 2 - 1;
+                float offL = mSelectionOffset * 2;
+
+                if (position < mSelectedPosition && mSelectionOffset > 0) {
+
+                    if (offR < 0) {
+                        offR = 0;
+                    }
+                    if (1 - offL < 0) {
+                        offL = 1;
+                    }
+                } else {
+                    offL = mSelectionOffset * 2 - 1;
+                    offR = mSelectionOffset * 2;
+                    if (offL < 0) {
+                        offL = 0;
+                    }
+                    if (1 - offR < 0) {
+                        offR = 1;
+                    }
+                }
+                left += ((nextLeft - left) * offL);
+                right += ((nextRight - right) * offR);
+            }else {
+                left += ((nextLeft - left) * mSelectionOffset);
+                right += ((nextRight - right) * mSelectionOffset);
+            }
 
         }
 
@@ -160,13 +189,21 @@ public class SlidingTabStrip extends LinearLayout {
 
     @Override
     public void draw(Canvas canvas) {
-        super.draw(canvas);
         if (isInEditMode() || getChildCount() <= 0) {
+            super.draw(canvas);
             return;
         }
         // Thick colored underline below the current selection
         if (indicator != null && mIndicatorLeft >= 0 && mIndicatorRight > mIndicatorLeft) {
-            indicator.draw(canvas, mIndicatorLeft, mIndicatorRight, getHeight());
+            if (indicator.isForeground()) {
+                super.draw(canvas);
+                indicator.draw(canvas, mIndicatorLeft, mIndicatorRight, getHeight());
+            } else {
+                indicator.draw(canvas, mIndicatorLeft, mIndicatorRight, getHeight());
+                super.draw(canvas);
+            }
+
         }
+
     }
 }

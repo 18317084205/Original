@@ -88,14 +88,15 @@ class HomeActivity : AppCompatActivity() {
         tabLayout.setTabTextColors(Color.BLACK, Color.RED);
         navigationView_top.setTabTextColors(Color.BLACK, Color.RED);
         navigationView.setScroller(false)
+        navigationView_top.setDividerWidth(5)
         for (i in 0 until 12) {
             list.add(layoutInflater.inflate(R.layout.flash_one, null))
-            navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab$i"))
+            navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab$i").setIcon(android.R.drawable.ic_menu_share).setIconColor(Color.BLACK, Color.RED))
             tabLayout.addTab(tabLayout.newTab().setText("Tab$i+10"))
             navigationView.addTab(NavigationMenu.newInstance(this, "Tab$i", android.R.drawable.ic_menu_camera))
             linearLayout.addView(navigationView_top.newTab().setTitle("Tab$i+10"), LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f))
         }
-        navigationView_top.setMode(TabLayout.MODE_FIXED)
+        navigationView_top.setMode(TabLayout.MODE_SCROLLABLE)
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab1"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
@@ -106,9 +107,13 @@ class HomeActivity : AppCompatActivity() {
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab123123123"))
 //        navigationView_top.addTab(navigationView_top.newTab().setTitle("Tab2"))
         var ind = JIndicator()
-        ind.setType(Indicator.TYPE_TRIANGLE)
-        ind.setHeight(30)
-        ind.setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+        ind.setType(JIndicator.TYPE_TRIANGLE)
+//        ind.width = 40
+        ind.height = 10
+        ind.setRadius(5)
+        ind.setColor(Color.GREEN)
+        ind.isForeground = true
+        ind.setTransitionScroll(true)
         navigationView_top.setIndicator(ind)
 
         tabLayout.addTab(tabLayout.newTab().setText("Tab1"))
@@ -128,13 +133,15 @@ class HomeActivity : AppCompatActivity() {
         navigationView_top.setupWithViewPager(viewPager)
 
 
-        navigationView_top.addOnTabSelectedListener(object :OnTabSelectedListener{
+        navigationView_top.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabUnselected(tab: Int) {
                 Log.e("navigationView_top_OnTabSelectedListener", "onTabUnselected: ...$tab")
             }
+
             override fun onTabReselected(tab: Int) {
                 Log.e("navigationView_top_OnTabSelectedListener", "onTabReselected: ...$tab")
             }
+
             override fun onTabSelected(tab: Int) {
                 Log.e("navigationView_top_OnTabSelectedListener", "onTabSelected: ...$tab")
             }

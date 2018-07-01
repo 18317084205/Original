@@ -2,6 +2,7 @@ package com.liang.jtablayout.view;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
@@ -20,6 +21,12 @@ public class JTabView extends TabView {
     private TextView titleView;
     private ImageView iconView;
     private TextView badgeView;
+
+    private boolean bold;
+
+    public void setBold(boolean bold) {
+        this.bold = bold;
+    }
 
     private FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -48,6 +55,9 @@ public class JTabView extends TabView {
         if (titleView != null) {
             if (!TextUtils.isEmpty(getTitle())) {
                 titleView.setText(getTitle());
+                if (bold) {
+                    titleView.setTypeface(Typeface.defaultFromStyle(isSelected() ? Typeface.BOLD : Typeface.NORMAL));
+                }
                 titleView.setVisibility(VISIBLE);
             } else {
                 titleView.setVisibility(GONE);
@@ -122,6 +132,9 @@ public class JTabView extends TabView {
         // changed
         if (titleView != null && titleView.getVisibility() != GONE) {
             titleView.setSelected(selected);
+            if (bold) {
+                titleView.setTypeface(Typeface.defaultFromStyle(isSelected() ? Typeface.BOLD : Typeface.NORMAL));
+            }
         }
 
         if (getIcons() != null && iconView != null && iconView.getVisibility() != GONE) {

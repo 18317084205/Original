@@ -4,52 +4,58 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 
 public abstract class Indicator {
-    public static final int TYPE_LINE = 0;
-    public static final int TYPE_RECT = 1;
-    public static final int TYPE_TRIANGLE = 2;
-    protected int type = TYPE_LINE;
-    protected float widthScale = 0.5f;
-    protected int width = -1;
-    protected int height = 20;
-    protected int radius = 0;
-    protected int color = Color.GRAY;
 
-    public abstract void setType(int type);
+    private boolean foreground;
+    private float widthScale = 0.5f;
+    private int width = -1;
+    private int height = 20;
 
-    public abstract void setWidthScale(float scale);
+    private boolean transitionScroll;
 
-    public abstract void setWidth(int width);
+    //    public abstract void draw(Canvas canvas, float left, float top, float right, float bottom);
+    public abstract void draw(Canvas canvas, float left, float right, int tabHeight);
 
-    public abstract void setHeight(int height);
+    public boolean isForeground() {
+        return foreground;
+    }
 
-    public abstract void setRadius(int radius);
-
-    public abstract void setColor(int color);
-
-    public int getType() {
-        return type;
+    public void setForeground(boolean foreground) {
+        this.foreground = foreground;
     }
 
     public float getWidthScale() {
         return widthScale;
     }
 
+    public Indicator setWidthScale(float widthScale) {
+        this.widthScale = widthScale;
+        return this;
+    }
+
     public int getWidth() {
         return width;
+    }
+
+    public Indicator setWidth(int width) {
+        this.width = width;
+        return this;
     }
 
     public int getHeight() {
         return height;
     }
 
-    public int getRadius() {
-        return radius;
+    public Indicator setHeight(int height) {
+        this.height = height;
+        return this;
     }
 
-    public int getColor() {
-        return color;
+    public Indicator setTransitionScroll(boolean transitionScroll) {
+        this.transitionScroll = transitionScroll;
+        return this;
     }
 
-    //    public abstract void draw(Canvas canvas, float left, float top, float right, float bottom);
-    public abstract void draw(Canvas canvas, float left, float right, int tabHeight);
+    public boolean isTransitionScroll() {
+        return transitionScroll;
+    }
 }

@@ -204,9 +204,9 @@ public class JTabLayout extends HorizontalScrollView implements Menu.OnClickList
         if (indicator == null) {
             return 0;
         }
-        int indicatorWidth = indicator.width;
+        int indicatorWidth = indicator.getWidth();
         if (indicatorWidth <= 0) {
-            indicatorWidth = (int) (tabItem.getWidth() * indicator.widthScale);
+            indicatorWidth = (int) (tabItem.getWidth() * indicator.getWidthScale());
         }
         return indicatorWidth;
     }

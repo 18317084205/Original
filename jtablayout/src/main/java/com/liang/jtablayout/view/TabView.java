@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.liang.jtablayout.utils.DrawableUtils;
@@ -46,11 +48,22 @@ public abstract class TabView extends FrameLayout {
         return icons;
     }
 
+    public TabView setIcon(int defaultIcon) {
+        Drawable defaultDrawable = ContextCompat.getDrawable(getContext(), defaultIcon);
+        return setIcon(defaultDrawable);
+    }
+
     public TabView setIcon(Drawable defaultIcon) {
         icons = new Drawable[2];
         icons[0] = defaultIcon;
         icons[1] = defaultIcon;
         return this;
+    }
+
+    public TabView setIcon(int defaultIcon, int selectedIcon) {
+        Drawable defaultDrawable = ContextCompat.getDrawable(getContext(), defaultIcon);
+        Drawable selectedDrawable = ContextCompat.getDrawable(getContext(), selectedIcon);
+        return setIcon(defaultDrawable, selectedDrawable);
     }
 
     public TabView setIcon(Drawable defaultIcon, Drawable selectedIcon) {
@@ -62,12 +75,15 @@ public abstract class TabView extends FrameLayout {
         return this;
     }
 
+    public TabView setIconColor(int defaultColor, int selectedColor) {
+        return setIconColor(createColorStateList(defaultColor, selectedColor));
+    }
 
     public TabView setIconColor(ColorStateList iconColor) {
         if (icons != null && iconColor != null) {
             Drawable[] newIcons = new Drawable[2];
-            newIcons[0] = DrawableUtils.tintDrawable(icons[0], titleColor.getColorForState(EMPTY_STATE_SET, Color.GRAY));
-            newIcons[1] = DrawableUtils.tintDrawable(icons[1], titleColor.getColorForState(SELECTED_STATE_SET, Color.BLACK));
+            newIcons[0] = DrawableUtils.tintDrawable(icons[0], iconColor.getColorForState(EMPTY_STATE_SET, Color.GRAY));
+            newIcons[1] = DrawableUtils.tintDrawable(icons[1], iconColor.getColorForState(SELECTED_STATE_SET, Color.BLACK));
             icons = newIcons;
         }
         return this;
@@ -80,6 +96,23 @@ public abstract class TabView extends FrameLayout {
     public TabView setTitle(CharSequence title) {
         this.title = title;
         return this;
+    }
+
+    public TabView setTitle(int strId) {
+        return setTitle(getContext().getString(strId));
+    }
+
+    public TabView setTitleColor(int defaultColor, int selectedColor) {
+        return setTitleColor(createColorStateList(defaultColor, selectedColor));
+    }
+
+    public TabView setTitleColor(ColorStateList titleColor) {
+        this.titleColor = titleColor;
+        return this;
+    }
+
+    public ColorStateList getTitleColor() {
+        return titleColor;
     }
 
     public CharSequence getContentDesc() {
@@ -109,13 +142,20 @@ public abstract class TabView extends FrameLayout {
         return this;
     }
 
-    public TabView setTitleColor(ColorStateList titleColor) {
-        this.titleColor = titleColor;
-        return this;
+    private ColorStateList createColorStateList(int defaultColor, int selectedColor) {
+        final int[][] states = new int[2][];
+        final int[] colors = new int[2];
+        int i = 0;
+        states[i] = SELECTED_STATE_SET;
+        colors[i] = selectedColor;
+        i++;
+
+        // Default enabled state
+        states[i] = EMPTY_STATE_SET;
+        colors[i] = defaultColor;
+        i++;
+        return new ColorStateList(states, colors);
     }
 
-    public ColorStateList getTitleColor() {
-        return titleColor;
-    }
 
 }
